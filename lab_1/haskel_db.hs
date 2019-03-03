@@ -27,6 +27,10 @@ sign in
 import Database.MySQL.Simple
 import Control.Monad
 import Data.Text as Text
+import Data.Typeable
+--import Data.Text.Format
+
+data User = User {login :: String, password :: String} deriving (Show)
 
 separator = "********************************************************************************"
 
@@ -38,14 +42,19 @@ startProg conn = do
   putStrLn "Enter your password: "
   password' <- getLine
   putStrLn separator
-  res <- query conn "select login from Users where login=? and password=?" ["heh", "1"]
-  case res of
+  res <- query conn "SELECT * FROM Users where login=? and password=?" (login' :: String, password' :: String)
+  --forM_ res $ \num ->
+    --putStrLn $ Text.unpack fname ++ " " ++ Text.unpack lname
+  --print (res :: [(String, String)]) 
+  case res :: [(String, String)] of
     [] -> do
       putStrLn "ERROR: Please try again"
       --start conn
     _ -> do
       putStrLn $ "ALERT: Hello " ++ login'
 
+--process :: m => m ()
+      
 main :: IO () 
 main = do
   conn <- connect defaultConnectInfo
