@@ -81,6 +81,4 @@ module Main where
   main :: IO ()
   main = do
     point <- readStart
-    let a = go [point]
-
-    print $ maybe "No soulution" printDesk a
+    putStrLn $ maybe "No soulution" printDesk $ go [point]
