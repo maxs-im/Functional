@@ -56,7 +56,7 @@ menuView conn = do
     "1" -> softwareView conn
     "2" -> authorView conn
     "3" -> usingView conn
-    "4" -> putStrLn "doing"--statisticView conn
+    "4" -> statisticView conn
     _ -> putStrLn "Buy!"
 
 softwareView conn = do
@@ -71,7 +71,7 @@ softwareView conn = do
   clearScreen
   case choose of
     "1" -> putStrLn "S1!"
-    "2" -> putStrLn "S2!"
+    "2" -> deleteSoftware conn
     "3" -> putStrLn "S3!"
     "4" -> softwareShow conn
     _ -> menuView conn
@@ -88,7 +88,7 @@ authorView conn = do
   clearScreen
   case choose of
     "1" -> putStrLn "A1!"
-    "2" -> putStrLn "A2!"
+    "2" -> deleteAuthor conn
     "3" -> putStrLn "A3!"
     "4" -> authorShow conn
     _ -> menuView conn
@@ -126,7 +126,6 @@ statisticView conn = do
           putStrLn $ format "It is used by {0} times" [(show num)]
   separator
   endTask conn
-
 
 softwareShow conn = do
   clearScreen
@@ -176,6 +175,34 @@ usingShow conn = do
   where
     headers = ("Software", "Name", "Info")
 
+deleteSoftware conn = do
+  clearScreen
+  separator
+  putStrLn "Let's delete Software"
+  softId' <- getUniqSoft conn
+  case softId' of
+    Nothing -> do
+      putStrLn "Nonexisten"
+    Just id -> do
+      execute conn "delete from Software where id = ?" [id :: Int]
+      putStrLn "Deleted"
+  separator
+  endTask conn
+
+deleteAuthor conn = do
+  clearScreen
+  separator
+  putStrLn "Let's delete Author"
+  softId' <- getUniqSoft conn
+  case softId' of
+    Nothing -> do
+      putStrLn "Nonexisten"
+    Just id -> do
+      execute conn "delete from Author where id = ?" [id :: Int]
+      putStrLn "Deleted"
+  separator
+  endTask conn
+
 
 endTask :: Connection -> IO ()
 endTask conn = do
@@ -201,23 +228,6 @@ unpackVal onId =
   case onId of
     [] -> Nothing
     [Only id] -> Just id
-
-{-
-tempee :: Connection -> IO (Maybe Int)
-tempee conn = do
-  name' <- getLine
-  case name' of
-    "" -> do
-      return Nothing
-    _-> do
-      num <- query conn "select id from Software where name=?" ["windows" :: String]
-      case num :: [Only Int] of
-        [] -> do
-          --putStrLn "Nonexistent"
-          Nothing
-        [Only id] -> do
-          Just id
--}
   
 main :: IO () 
 main = do
