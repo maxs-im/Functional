@@ -89,7 +89,7 @@ authorView conn = do
   choose <- getLine
   clearScreen
   case choose of
-    "1" -> putStrLn "A1!"
+    "1" -> editAuthView conn
     "2" -> deleteAuthor conn
     "3" -> addAuthor conn
     "4" -> authorShow conn
@@ -128,6 +128,20 @@ statisticView conn = do
           putStrLn $ format "It is used by {0} times" [(show num)]
   separator
   endTask conn
+
+editAuthView conn = do
+  clearScreen
+  separator
+  putStrLn "\t\tChoose union operation:\
+            \\t\t\t1. Add\n\
+            \\t\t\t2. Delete\n\
+            \\t\t\t_. RETURN"
+  choose <- getLine
+  clearScreen
+  case choose of
+    "1" -> deleteUnion conn
+    "2" -> addUnion conn
+    _ -> authorView conn
 
 softwareShow conn = do
   clearScreen
@@ -195,7 +209,7 @@ deleteAuthor conn = do
   clearScreen
   separator
   putStrLn "Let's delete Author"
-  softId' <- getUniqSoft conn
+  softId' <- getUniqAuth conn
   case softId' of
     Nothing -> do
       putStrLn "Nonexisten"
@@ -271,51 +285,48 @@ addAuthor conn = do
   separator
   endTask conn
 
-{-}ditSoftware conn = do
+addUnion conn = do
   clearScreen
   separator
-  putStrLn "What Author do you want to edit?"
-  softId' <- getUniqSoft conn
+  putStrLn "Add new Author to Software rights"
+  softId' <- getUniqAuth conn
   case softId' of
     Nothing -> do
-      putStrLn "Nonexisten"
-    Just id -> do
-      [n, d, v, s] <- collectSoft
-      resultS <- try(execute conn "update Software \
-                    \set name=?, description=?, version=?, source=? \
-                    \where id = ?" [n, d, v, s, (show id)]) :: IO (Either SomeException Int64)
-      case resultS of
-        Left ex  -> putStrLn "Hey, duplicate name! Try again!"
-        Right val -> do
-          putStrLn (show val)
-          [i, ss, e] <- collectTerm
-          resultT <- try (execute conn "update Terms \ 
-                        \set info=?, \
-                        \start = STR_TO_DATE(?,'%d,%m,%Y'), \
-                        \end = STR_TO_DATE(?,'%d,%m,%Y') \
-                      \where id=?" [i, ss, e, (show id)]) :: IO (Either SomeException Int64)
-          case resultT of
-            Left ex  -> putStrLn "Incorrect Time! Term left old!"
+      putStrLn "Nonexisten Software"
+    Just sid -> do
+      authId' <- getUniqAuth conn
+      case authId' of
+        Nothing -> do
+          putStrLn "Nonexisten Author"
+        Just aid -> do
+          resultSA <- try(execute conn "insert Software_Author (software_id, author_id) \
+                    \values (?, ?)" [(show sid), (show aid)]) :: IO (Either SomeException Int64)
+          case resultSA of
+            Left ex  -> putStrLn "Hey, duplicate pair! Try again!"
             Right val -> putStrLn "Done"
+
   separator
   endTask conn
--}
 
-addAuthor conn = do
+deleteUnion conn = do
   clearScreen
   separator
-  putStrLn "Add new Author"
-  separator
-  dataA <- collectAuthor
-  resultA <- try (execute conn "insert into Author (name) \
-                              \values (?)" dataA) :: IO (Either SomeException Int64)
-  case resultA of
-    Left ex  -> putStrLn "Hey, duplicate! Try again!"
-    Right val -> do
-      putStrLn "Done"
-
-  separator
-  endTask conn
+  putStrLn "Delete Author from Software rights"
+  softId' <- getUniqAuth conn
+  case softId' of
+    Nothing -> do
+      putStrLn "Nonexisten Software"
+    Just sid -> do
+      authId' <- getUniqAuth conn
+      case authId' of
+        Nothing -> do
+          putStrLn "Nonexisten Author"
+        Just aid -> do
+          resultSA <- try(execute conn "delete Software_Author \
+                                        \where software_id=? and author_id=?" [(show sid), (show aid)]) :: IO (Either SomeException Int64)
+          case resultSA of
+            Left ex  -> putStrLn "Hey, nonexisten! Try again!"
+            Right val -> putStrLn "Done"
 
 addUse conn = do
   clearScreen
