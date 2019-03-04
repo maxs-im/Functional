@@ -38,13 +38,13 @@ ENGINE = InnoDB
 ;
 
 CREATE TABLE IF NOT EXISTS `Terms` (
-    `software_id` INT(11) NOT NULL,
+    `id` INT(11) NOT NULL,
     `start` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `end` TIMESTAMP NULL,
     `info` VARCHAR(127),
-    PRIMARY KEY (`software_id`),
-    CHECK (`start` < `end`),
-    CONSTRAINT `fk_terms_software` FOREIGN KEY (`software_id`)
+    PRIMARY KEY (`id`),
+    CHECK (`end` is NULL or `start` < `end`),
+    CONSTRAINT `fk_terms_software` FOREIGN KEY (`id`)
         REFERENCES `Software` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
@@ -62,8 +62,7 @@ CREATE TABLE IF NOT EXISTS `Using_info` (
 /*SOME DEFAULT DATA*/
 
 INSERT `Users`(`login`, `password`)
-VALUES
-('first', '1');
+VALUES ('first', '1');
 
 insert into Author (name)
 values ("author 1"), ("author 2");
@@ -74,9 +73,11 @@ values ("windows", "win desc", "10.1", "computer"),
 
 insert into Software_Author (software_id, author_id)
 select s.id, a.id from Software as s inner join Author as a on a.name like 'author%' where s.name = "windows";
+insert into Software_Author (software_id, author_id)
+select s.id, a.id from Software as s inner join Author as a on a.name = 'author 2' where s.name = "linux";
 
 insert into Using_info (software_id, name, info)
 select id, "student IC-4", "for fun" from Software where name = "windows"; 
 
-insert into Terms (software_id, info)
+insert into Terms (id, info)
 select id, "some interesting term" from Software where name = "linux";
