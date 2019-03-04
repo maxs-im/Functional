@@ -11,11 +11,11 @@ import Text.Format (format)
 import Control.Exception
 import GHC.Int
 
---TODO: change before merge
 clearScreen :: IO ()
 clearScreen = do
   {-_ <- SP.system "reset"
   return ()-}
+  -- NOTE: more faster way but less pretty
   putStr "\ESC[2J"
 
 data User = User {login :: String, password :: String} deriving (Show)
@@ -37,8 +37,6 @@ startProg conn = do
   case res :: [(String, String)] of
     [] -> do
       putStrLn "ERROR: Please try again"
-      --TODO: delete before merge
-      menuView conn
     _ -> do
       putStrLn $ "Nice to meet you, " ++ login'
       menuView conn
@@ -64,9 +62,9 @@ menuView conn = do
 softwareView conn = do
   clearScreen
   putStrLn "\tSoftware + Terms:\n\
-            \\t\t1. Edit\n\
+            \\t\t1. Add\n\
             \\t\t2. Delete\n\
-            \\t\t3. Add\n\
+            \\t\t3. Edit\n\
             \\t\t4. Show\n\
             \\t_. RETURN"
   choose <- getLine
@@ -132,9 +130,9 @@ statisticView conn = do
 editAuthView conn = do
   clearScreen
   separator
-  putStrLn "\t\tChoose union operation:\
-            \\t\t\t1. Add\n\
-            \\t\t\t2. Delete\n\
+  putStrLn "\t\tChoose union operation:\n\
+            \\t\t\t1. Delete\n\
+            \\t\t\t2. Add\n\
             \\t\t\t_. RETURN"
   choose <- getLine
   clearScreen
@@ -256,7 +254,6 @@ editSoftware conn = do
       case resultS of
         Left ex  -> putStrLn "Hey, duplicate name! Try again!"
         Right val -> do
-          putStrLn (show val)
           [i, ss, e] <- collectTerm
           resultT <- try (execute conn "update Terms \ 
                         \set info=?, \
@@ -289,21 +286,23 @@ addUnion conn = do
   clearScreen
   separator
   putStrLn "Add new Author to Software rights"
-  softId' <- getUniqAuth conn
-  case softId' of
+  authId' <- getUniqAuth conn
+  case authId' of
     Nothing -> do
-      putStrLn "Nonexisten Software"
-    Just sid -> do
-      authId' <- getUniqAuth conn
-      case authId' of
+      putStrLn "Nonexisten Author"
+    Just aid -> do
+      softId' <- getUniqSoft conn
+      case softId' of
         Nothing -> do
-          putStrLn "Nonexisten Author"
-        Just aid -> do
+          putStrLn "Nonexisten Software"
+        Just sid -> do
           resultSA <- try(execute conn "insert Software_Author (software_id, author_id) \
                     \values (?, ?)" [(show sid), (show aid)]) :: IO (Either SomeException Int64)
           case resultSA of
-            Left ex  -> putStrLn "Hey, duplicate pair! Try again!"
-            Right val -> putStrLn "Done"
+            Left ex  -> do
+              putStrLn "Hey, duplicate pair! Try again!"
+            Right val -> do
+              putStrLn "Done"
 
   separator
   endTask conn
@@ -312,21 +311,28 @@ deleteUnion conn = do
   clearScreen
   separator
   putStrLn "Delete Author from Software rights"
-  softId' <- getUniqAuth conn
-  case softId' of
+  authId' <- getUniqAuth conn
+  case authId' of
     Nothing -> do
-      putStrLn "Nonexisten Software"
-    Just sid -> do
-      authId' <- getUniqAuth conn
-      case authId' of
+      putStrLn "Nonexisten Author"
+    Just aid -> do
+      softId' <- getUniqSoft conn
+      case softId' of
         Nothing -> do
-          putStrLn "Nonexisten Author"
-        Just aid -> do
-          resultSA <- try(execute conn "delete Software_Author \
+          putStrLn "Nonexisten Software"
+        Just sid -> do
+          resultSA <- try(execute conn "delete from Software_Author \
                                         \where software_id=? and author_id=?" [(show sid), (show aid)]) :: IO (Either SomeException Int64)
           case resultSA of
-            Left ex  -> putStrLn "Hey, nonexisten! Try again!"
-            Right val -> putStrLn "Done"
+            Left ex -> do
+              putStrLn "Hey, ERROR! Try again!"
+            Right 0 -> do
+              putStrLn "Hey, nonexisten! Try again!"
+            Right val -> do
+              putStrLn "Done"
+  
+  separator
+  endTask conn
 
 addUse conn = do
   clearScreen
@@ -357,10 +363,13 @@ deleteUse conn = do
       putStrLn "Nonexisten"
     Just id -> do
       [n, i] <- collectUse
-      resultA <- try (execute conn "delete Using_info \
+      resultA <- try (execute conn "delete from Using_info \
                                   \where name=? and info=? and software_id=?" [n, i, (show id)]) :: IO (Either SomeException Int64)
       case resultA of
-        Left ex  -> putStrLn "Hey, nonexisten! Try again!"
+        Left ex -> do
+          putStrLn "Hey, ERROR! Try again!"
+        Right 0 -> do
+          putStrLn "Hey, nonexisten! Try again!"
         Right val -> do
           putStrLn "Done"
 
@@ -443,6 +452,5 @@ main = do
     , connectPassword = ""
     , connectDatabase = "haskell"
     }
-  --startProg conn
-  editSoftware conn
+  startProg conn
   close conn
