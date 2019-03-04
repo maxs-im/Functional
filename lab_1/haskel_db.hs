@@ -8,6 +8,8 @@ import Data.Typeable
 import qualified System.Process as SP
 import Text.PrettyPrint.Tabulate (printTable)
 import Text.Format (format)
+import Control.Exception
+import GHC.Int
 
 --TODO: change before merge
 clearScreen :: IO ()
@@ -57,7 +59,7 @@ menuView conn = do
     "2" -> authorView conn
     "3" -> usingView conn
     "4" -> statisticView conn
-    _ -> putStrLn "Buy!"
+    _ -> putStrLn "Bye!"
 
 softwareView conn = do
   clearScreen
@@ -70,9 +72,9 @@ softwareView conn = do
   choose <- getLine
   clearScreen
   case choose of
-    "1" -> putStrLn "S1!"
+    "1" -> addSoftware conn
     "2" -> deleteSoftware conn
-    "3" -> putStrLn "S3!"
+    "3" -> editSoftware conn
     "4" -> softwareShow conn
     _ -> menuView conn
 
@@ -89,22 +91,22 @@ authorView conn = do
   case choose of
     "1" -> putStrLn "A1!"
     "2" -> deleteAuthor conn
-    "3" -> putStrLn "A3!"
+    "3" -> addAuthor conn
     "4" -> authorShow conn
     _ -> menuView conn
 
 usingView conn = do
   clearScreen
   putStrLn "\tUsing:\n\
-            \\t\t1. Edit\n\
+            \\t\t1. Delete\n\
             \\t\t2. Add\n\
             \\t\t3. Show\n\
             \\t_. RETURN"
   choose <- getLine
   clearScreen
   case choose of
-    "1" -> putStrLn "U1!"
-    "2" -> putStrLn "U2!"
+    "1" -> deleteUse conn
+    "2" -> addUse conn
     "3" -> usingShow conn
     _ -> menuView conn
 
@@ -203,6 +205,200 @@ deleteAuthor conn = do
   separator
   endTask conn
 
+addSoftware conn = do
+  clearScreen
+  separator
+  putStrLn "Add new Software"
+  separator
+  dataS <- collectSoft
+  resultS <- try (execute conn "insert into Software (name, description, version, source) \
+                              \values (?, ?, ?, ?)" dataS) :: IO (Either SomeException Int64)
+  case resultS of
+    Left ex  -> putStrLn "Hey, duplicate! Try again!"
+    Right val -> do
+      dataT <- collectTerm
+      resultT <- try (execute conn "insert into Terms (info, start, end) \
+                    \values (?, STR_TO_DATE(?,'%d,%m,%Y'), STR_TO_DATE(?,'%d,%m,%Y'))" dataT) :: IO (Either SomeException Int64)
+      case resultT of
+        Left ex  -> putStrLn "Incorrect Time! Term set default!"
+        Right val -> putStrLn "Done"
+
+  separator
+  endTask conn
+
+editSoftware conn = do
+  clearScreen
+  separator
+  putStrLn "What Software do you want to edit?"
+  softId' <- getUniqSoft conn
+  case softId' of
+    Nothing -> do
+      putStrLn "Nonexisten"
+    Just id -> do
+      [n, d, v, s] <- collectSoft
+      resultS <- try(execute conn "update Software \
+                    \set name=?, description=?, version=?, source=? \
+                    \where id = ?" [n, d, v, s, (show id)]) :: IO (Either SomeException Int64)
+      case resultS of
+        Left ex  -> putStrLn "Hey, duplicate name! Try again!"
+        Right val -> do
+          putStrLn (show val)
+          [i, ss, e] <- collectTerm
+          resultT <- try (execute conn "update Terms \ 
+                        \set info=?, \
+                        \start = STR_TO_DATE(?,'%d,%m,%Y'), \
+                        \end = STR_TO_DATE(?,'%d,%m,%Y') \
+                      \where id=?" [i, ss, e, (show id)]) :: IO (Either SomeException Int64)
+          case resultT of
+            Left ex  -> putStrLn "Incorrect Time! Term left old!"
+            Right val -> putStrLn "Done"
+  separator
+  endTask conn
+
+addAuthor conn = do
+  clearScreen
+  separator
+  putStrLn "Add new Author"
+  separator
+  dataA <- collectAuthor
+  resultA <- try (execute conn "insert into Author (name) \
+                              \values (?)" dataA) :: IO (Either SomeException Int64)
+  case resultA of
+    Left ex  -> putStrLn "Hey, duplicate! Try again!"
+    Right val -> do
+      putStrLn "Done"
+
+  separator
+  endTask conn
+
+{-}ditSoftware conn = do
+  clearScreen
+  separator
+  putStrLn "What Author do you want to edit?"
+  softId' <- getUniqSoft conn
+  case softId' of
+    Nothing -> do
+      putStrLn "Nonexisten"
+    Just id -> do
+      [n, d, v, s] <- collectSoft
+      resultS <- try(execute conn "update Software \
+                    \set name=?, description=?, version=?, source=? \
+                    \where id = ?" [n, d, v, s, (show id)]) :: IO (Either SomeException Int64)
+      case resultS of
+        Left ex  -> putStrLn "Hey, duplicate name! Try again!"
+        Right val -> do
+          putStrLn (show val)
+          [i, ss, e] <- collectTerm
+          resultT <- try (execute conn "update Terms \ 
+                        \set info=?, \
+                        \start = STR_TO_DATE(?,'%d,%m,%Y'), \
+                        \end = STR_TO_DATE(?,'%d,%m,%Y') \
+                      \where id=?" [i, ss, e, (show id)]) :: IO (Either SomeException Int64)
+          case resultT of
+            Left ex  -> putStrLn "Incorrect Time! Term left old!"
+            Right val -> putStrLn "Done"
+  separator
+  endTask conn
+-}
+
+addAuthor conn = do
+  clearScreen
+  separator
+  putStrLn "Add new Author"
+  separator
+  dataA <- collectAuthor
+  resultA <- try (execute conn "insert into Author (name) \
+                              \values (?)" dataA) :: IO (Either SomeException Int64)
+  case resultA of
+    Left ex  -> putStrLn "Hey, duplicate! Try again!"
+    Right val -> do
+      putStrLn "Done"
+
+  separator
+  endTask conn
+
+addUse conn = do
+  clearScreen
+  separator
+  putStrLn "Add new Usage"
+  separator
+  softId' <- getUniqSoft conn
+  case softId' of
+    Nothing -> do
+      putStrLn "Nonexisten"
+    Just id -> do
+      [n, i] <- collectUse
+      execute conn "insert into Using_info (name, info, software_id) \
+                    \values (?, ?, ?)" [n, i, (show id)]
+      putStrLn "Done"
+
+  separator
+  endTask conn
+
+deleteUse conn = do
+  clearScreen
+  separator
+  putStrLn "What Usage do you want to delete?"
+  separator
+  softId' <- getUniqSoft conn
+  case softId' of
+    Nothing -> do
+      putStrLn "Nonexisten"
+    Just id -> do
+      [n, i] <- collectUse
+      resultA <- try (execute conn "delete Using_info \
+                                  \where name=? and info=? and software_id=?" [n, i, (show id)]) :: IO (Either SomeException Int64)
+      case resultA of
+        Left ex  -> putStrLn "Hey, nonexisten! Try again!"
+        Right val -> do
+          putStrLn "Done"
+
+  separator
+  endTask conn
+
+collectUse = do
+  putStrLn "Create Usage, Please"
+  putStr "Name: "
+  name' <- getLine
+  putStr "Info: "
+  info' <- getLine
+
+  return [name', info']
+
+collectAuthor = do
+  putStrLn "Create Author, Please"
+  putStr "Name: "
+  name' <- getLine
+
+  return [name']
+
+collectSoft :: IO [String]
+collectSoft = do
+  putStrLn "Create Software, Please"
+  putStr "Name:"
+  name' <- getLine
+  putStr "Description: "
+  description' <- getLine
+  putStr "Version: "
+  version' <- getLine
+  putStr "Source: "
+  source' <- getLine
+  
+  return [name', description', version', source']
+
+collectTerm :: IO [String]
+collectTerm = do
+  putStrLn "Create Term for Software, Please"
+  putStr "Information:"
+  info' <- getLine
+  putStrLn "Write date in format '%d,%m,%Y'. It is important!"
+  putStr "Start date: "
+  start' <- getLine
+  putStr "End date: "
+  end' <- getLine
+  putStr "Source: "
+
+  return [info', start', end']
 
 endTask :: Connection -> IO ()
 endTask conn = do
@@ -237,5 +433,5 @@ main = do
     , connectDatabase = "haskell"
     }
   --startProg conn
-  statisticView conn
+  editSoftware conn
   close conn
