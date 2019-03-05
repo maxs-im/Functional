@@ -166,7 +166,7 @@ authorShow conn = do
   separator
   res <- query_ conn "select a.name, group_concat(distinct s.name separator ', ')\
                       \from Author as a \
-                      \   inner join Software_Author as sa on sa.author_id = a.id \
+                      \   left join Software_Author as sa on sa.author_id = a.id \
                       \   inner join Software as s on sa.software_id = s.id \
                       \group by a.name"
   printTable (headers:(res :: [(String, String)]))
@@ -254,12 +254,12 @@ editSoftware conn = do
       case resultS of
         Left ex  -> putStrLn "Hey, duplicate name! Try again!"
         Right val -> do
-          [i, ss, e] <- collectTerm
+          dataS <- collectTerm
           resultT <- try (execute conn "update Terms \ 
                         \set info=?, \
                         \start = STR_TO_DATE(?,'%d,%m,%Y'), \
                         \end = STR_TO_DATE(?,'%d,%m,%Y') \
-                      \where id=?" [i, ss, e, (show id)]) :: IO (Either SomeException Int64)
+                      \where id=?" $ dataS++[show id]) :: IO (Either SomeException Int64)
           case resultT of
             Left ex  -> putStrLn "Incorrect Time! Term left old!"
             Right val -> putStrLn "Done"
@@ -376,6 +376,12 @@ deleteUse conn = do
   separator
   endTask conn
 
+validateName name = valid
+  where
+    valid = if name == ""
+      then "None"
+      else name
+
 collectUse = do
   putStrLn "Create Usage, Please"
   putStr "Name: "
@@ -383,14 +389,14 @@ collectUse = do
   putStr "Info: "
   info' <- getLine
 
-  return [name', info']
+  return [(validateName name'), info']
 
 collectAuthor = do
   putStrLn "Create Author, Please"
   putStr "Name: "
   name' <- getLine
 
-  return [name']
+  return [(validateName name')]
 
 collectSoft :: IO [String]
 collectSoft = do
@@ -404,7 +410,7 @@ collectSoft = do
   putStr "Source: "
   source' <- getLine
   
-  return [name', description', version', source']
+  return [(validateName name'), description', version', source']
 
 collectTerm :: IO [String]
 collectTerm = do

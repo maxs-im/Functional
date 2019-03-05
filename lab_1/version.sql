@@ -15,7 +15,9 @@ CREATE TABLE IF NOT EXISTS `Software` (
     `description` VARCHAR(255),
     `version` VARCHAR(5) NOT NULL,
     `source` VARCHAR(255) NOT NULL DEFAULT 'google.com',
-    PRIMARY KEY (`id`, `name`)    
+    PRIMARY KEY (`id`, `name`),
+    UNIQUE(`name`),
+    CHECK(`name` != '')  
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS `Author` (
