@@ -1,43 +1,78 @@
-;(finish-output *stream*)\
+
+(defun print-list (list)
+    "Print list of objects"
+    (dolist (item list)
+        (print-object item))
+)
 
 (defclass _Symbol ()
-    ((s :accessor s)
+    ((s
+        :initarg :s)
     )
 )
 
-(defclass _Punctuation (_Symbol)
-    ((ps :accessor ps)
-    )
-)
+#|
+(defmethod print-object ((obj _Symbol) out)
+    (write-char (s obj)))
+|#
+(defmethod print-object ((obj _Symbol) out)
+    (print-unreadable-object (obj out :type t)
+        (format out "~C" (s obj))))
 
 (defclass _Word ()
-    ((ws :accessor ws)
+    ((wsl 
+        :initform '()
+        :accessor wsl)
     )
+)
+(defmethod print-object ((obj _Word) out)
+    (print-unreadable-object (obj out :type t)
+        (print-list(wsl obj))))
+
+(defclass _Delimiter (_Word)
+    ()
+)
+
+(defclass _Punctuation (_Word)
+    ()
 )
 
 (defclass _Sentence ()
-    ((sw :accessor sw)
+    ((swl 
+        :initform '()
+        :accessor swl)
     )
 )
+(defmethod print-object ((obj _Sentence) out)
+    (print-unreadable-object (obj out :type t)
+        (print-list(swl obj))))
+(defmethod get-words ((obj _Sentence))
+    (remove-if-not (lambda (sw) (eq (typeof sw) '_Word)) (swl obj)))
 
 (defclass _Text ()
-    ((ts :accessor ts)
+    ((tsl
+        :initform '()
+        :accessor tsl)
     )
 )
+(defmethod print-object ((obj _Text) out)
+    (format out "\t\tTEXT\n")
+    (print-unreadable-object (obj out :type t)
+        (print-list(tsl obj)))
+    (format out "\t\tTHE END\n"))
+(defmethod get-words ((obj _Text))
+    (merge 
+        (map 
+            (remove-if-not (lambda (_s) (eq (typeof _s) '_Sentence)) (_s obj))  
+            (lambda (_s _Sentence) (get-words _s))))
+)
+
 
 (defun read-character()
     (write-line "Enter a character to sort: ")
     ; (terpri)
     (read-char)
 )
-
-#|
-(split-sequence:split-sequence-if
-            (lambda (item)
-              (position item " -+"))
-            "aa bb  ccc  dddd--eee++++ffff!"
-            :remove-empty-subseqs t)
-|#
 
 (defun parse-file(&optional path)
     "Parsing file by its path character by character"
@@ -64,7 +99,7 @@
 
 #|
 (defun run-app()
-    "Main function that starts application"
+    "Main function that started application"
     (let ((mychar (read-character)))
         (parse-file())
         (write mychar)
@@ -75,6 +110,7 @@
 (run-app)
 |#
 
+; (read-character)
 ;(parse-file())
 
 
