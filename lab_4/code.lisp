@@ -61,10 +61,11 @@
         (print-list(tsl obj)))
     (format out "\t\tTHE END\n"))
 (defmethod get-words ((obj _Text))
-    (merge 
-        (map 
-            (remove-if-not (lambda (_s) (eq (typeof _s) '_Sentence)) (_s obj))  
-            (lambda (_s _Sentence) (get-words _s))))
+    (delete nil
+        (concatenate  
+            (map 'list
+                (remove-if-not (lambda (_s) (eq (typeof _s) '_Sentence)) (_s obj))  
+                (lambda (_s _Sentence) (get-words _s)))))    
 )
 
 
