@@ -1,56 +1,82 @@
 ;(finish-output *stream*)\
-#|
-(defclass Symbol ()
-    (
-        (s :accessor s)
+
+(defclass _Symbol ()
+    ((s :accessor s)
     )
 )
 
-(defclass Punctuation (Symbol)
-    (
-        (ps :accessor ps)
+(defclass _Punctuation (_Symbol)
+    ((ps :accessor ps)
     )
 )
 
-(defclass Word ()
-    (
-        (ws :accessor ws)
+(defclass _Word ()
+    ((ws :accessor ws)
     )
 )
 
-(defclass Sentence ()
-    (
-        (sw :accessor sw)
+(defclass _Sentence ()
+    ((sw :accessor sw)
     )
 )
-|#
 
-(defvar mychar nil)
-(setf mychar (read-char))
-(write mychar)
+(defclass _Text ()
+    ((ts :accessor ts)
+    )
+)
 
-
-; (write sb-ext:*posix-argv*)
-(write-line "Commet")
+(defun read-character()
+    (write-line "Enter a character to sort: ")
+    ; (terpri)
+    (read-char)
+)
 
 #|
 (split-sequence:split-sequence-if
             (lambda (item)
               (position item " -+"))
-            "aa bb  ccc  dddd--eee++++ffff"
+            "aa bb  ccc  dddd--eee++++ffff!"
             :remove-empty-subseqs t)
 |#
 
-(defvar text (make-array 0))
-(defparameter storage (make-array 0))
-(with-open-file (stream "lab_4/test.txt" :direction :input)
-    (loop for symbol = (read-char stream nil)
-        while symbol do
-            (cond ()
-            )
-            (write-char symbol)
+(defun parse-file(&optional path)
+    "Parsing file by its path character by character"
+    ; default value for path
+    (when (null path) (setf path "lab_4/test.txt"))
+    ; (write sb-ext:*posix-argv*)
+
+    ;(defvar text (make-array 0))
+    ;(defparameter storage (make-array 0))
+
+    (with-open-file (stream path :direction :input)
+        (loop for symbol = (read-char stream nil)
+            while symbol do
+                (cond 
+                    ((find symbol ",;-:")
+                        (write-line "Punctuation"))
+                    ((find symbol ".!?")
+                        (write-line "New sentence"))
+                    (t (write-line "New word"))
+                )
+        )
     )
 )
 
+#|
+(defun run-app()
+    "Main function that starts application"
+    (let ((mychar (read-character)))
+        (parse-file())
+        (write mychar)
+    )
+)
 
-(write (sort '(2 4 7 3 9 1 5 4 6 3 8) '<))
+; Entrance
+(run-app)
+|#
+
+;(parse-file())
+
+
+
+; (write (sort '(2 4 7 3 9 1 5 4 6 3 8) '<))
