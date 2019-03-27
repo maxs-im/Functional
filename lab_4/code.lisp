@@ -7,6 +7,7 @@
 
 (defclass _Symbol ()
     ((s
+        :type :character
         :initarg :s)
     )
 )
@@ -16,8 +17,25 @@
     (write-char (s obj)))
 |#
 (defmethod print-object ((obj _Symbol) out)
-    (print-unreadable-object (obj out :type t)
-        (format out "~C" (s obj))))
+    (format out "~C" (s obj)))
+
+(defclass _Delimiter (_Symbol)
+    ()
+)
+(defmethod print-object ((obj _Delimiter) out)
+    (format out "~C" (s obj)))
+
+(defclass _Punctuation (_Symbol)
+    ()
+)
+(defmethod print-object ((obj _Punctuation) out)
+    (format out "~C" (s obj)))
+
+(defclass _PunctuationEnd (_Symbol)
+    ()
+)
+(defmethod print-object ((obj _PunctuationEnd) out)
+    (format out "~C" (s obj)))
 
 (defclass _Word ()
     ((wsl 
@@ -29,17 +47,10 @@
     (print-unreadable-object (obj out :type t)
         (print-list(wsl obj))))
 
-(defclass _Delimiter (_Word)
-    ()
-)
-
-(defclass _Punctuation (_Word)
-    ()
-)
-
 (defclass _Sentence ()
     ((swl 
         :initform '()
+        :type :list
         :accessor swl)
     )
 )
@@ -52,6 +63,8 @@
 (defclass _Text ()
     ((tsl
         :initform '()
+        :type :list
+        :initarg :tsl
         :accessor tsl)
     )
 )
@@ -75,25 +88,44 @@
     (read-char)
 )
 
+(defun is-letter(sym)
+    (or
+        (and (char-not-greaterp sym #\z) (char-not-lessp sym #\a))
+        (and (char-not-greaterp sym #\9) (char-not-lessp sym #\0)))
+)
+
+(defun convert-s(sym)
+    (cond 
+        ((find sym ",;-:")
+            (make-instance '_Punctuation :s sym))
+        ((find sym ".!?")
+            (make-instance '_PunctuationEnd :s sym))
+        ((is-letter(sym))
+            (make-instance '_Symbol :s sym))
+        (t 
+            (make-instance '_Delimiter :s sym))
+    )
+)
+
+(defun print-elements-of-list (list)
+       "Print each element of LIST on a line of its own."
+       (loop for item in list do
+         (print item)))
+
 (defun parse-file(&optional path)
     "Parsing file by its path character by character"
     ; default value for path
     (when (null path) (setf path "lab_4/test.txt"))
     ; (write sb-ext:*posix-argv*)
 
-    ;(defvar text (make-array 0))
-    ;(defparameter storage (make-array 0))
-
+    ;(prog ((storage_sym (make-array 0)) (text_result (make-instance '_Text :tsl (make-instance '_Delimiter))))
     (with-open-file (stream path :direction :input)
-        (loop for symbol = (read-char stream nil)
-            while symbol do
-                (cond 
-                    ((find symbol ",;-:")
-                        (write-line "Punctuation"))
-                    ((find symbol ".!?")
-                        (write-line "New sentence"))
-                    (t (write-line "New word"))
-                )
+        (let ((storage '()))
+            (loop for symbol = (read-char stream nil)
+                while symbol do 
+                    (setq storage (append storage (list (convert-s symbol))))
+            )
+            (print-elements-of-list storage)  
         )
     )
 )
@@ -112,7 +144,7 @@
 |#
 
 ; (read-character)
-;(parse-file())
+(parse-file())
 
 
 
