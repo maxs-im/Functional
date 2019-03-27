@@ -24,16 +24,15 @@
     ()
 )
 (defclass _Word ()
-    ((wsl 
+    ((wsl
         :initform '()
+        :type :list
         :accessor wsl)
     )
 )
-#|
 (defmethod print-object ((obj _Word) out)
-    (print-unreadable-object (obj out :type t)
-        (print-list(wsl obj))))
-|#
+    (print-list(wsl obj)))
+
 (defclass _Sentence ()
     ((swl 
         :initform '()
@@ -53,7 +52,6 @@
     ((tsl
         :initform '()
         :type :list
-        :initarg :tsl
         :accessor tsl)
     )
 )
@@ -99,7 +97,12 @@
 )
 
 (defun parse-storage (storage)
-    (print-list storage)
+    ; (print-list storage)
+    (let ((cur_text (make-instance '_Text)) (cur_word (make-instance '_Word)) (cur_sen (make-instance '_Sentence)))
+        (loop for item in storage do
+            (write item)
+        )
+    )
 )
 
 (defun parse-file(&optional path)
@@ -116,8 +119,7 @@
                     (setq storage (append storage (list (convert-s symbol))))
             )
             ; TODO: parse storage
-            (parse-storage storage)
-            ;(print-elements-of-list storage)  
+            (parse-storage storage)  
         )
     )
 )
