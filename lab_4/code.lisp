@@ -1,52 +1,39 @@
 
 (defun print-list (list)
-    "Print list of objects"
-    (dolist (item list)
-        (print-object item))
-)
+    "Print each element one by one."
+    (loop for item in list do
+        (write item)))
 
 (defclass _Symbol ()
     ((s
         :type :character
+        :accessor s
         :initarg :s)
     )
 )
-
-#|
 (defmethod print-object ((obj _Symbol) out)
     (write-char (s obj)))
-|#
-(defmethod print-object ((obj _Symbol) out)
-    (format out "~C" (s obj)))
 
 (defclass _Delimiter (_Symbol)
     ()
 )
-(defmethod print-object ((obj _Delimiter) out)
-    (format out "~C" (s obj)))
-
 (defclass _Punctuation (_Symbol)
     ()
 )
-(defmethod print-object ((obj _Punctuation) out)
-    (format out "~C" (s obj)))
-
 (defclass _PunctuationEnd (_Symbol)
     ()
 )
-(defmethod print-object ((obj _PunctuationEnd) out)
-    (format out "~C" (s obj)))
-
 (defclass _Word ()
     ((wsl 
         :initform '()
         :accessor wsl)
     )
 )
+#|
 (defmethod print-object ((obj _Word) out)
     (print-unreadable-object (obj out :type t)
         (print-list(wsl obj))))
-
+|#
 (defclass _Sentence ()
     ((swl 
         :initform '()
@@ -54,9 +41,11 @@
         :accessor swl)
     )
 )
+#|
 (defmethod print-object ((obj _Sentence) out)
     (print-unreadable-object (obj out :type t)
         (print-list(swl obj))))
+|#
 (defmethod get-words ((obj _Sentence))
     (remove-if-not (lambda (sw) (eq (typeof sw) '_Word)) (swl obj)))
 
@@ -68,11 +57,13 @@
         :accessor tsl)
     )
 )
+#|
 (defmethod print-object ((obj _Text) out)
     (format out "\t\tTEXT\n")
     (print-unreadable-object (obj out :type t)
         (print-list(tsl obj)))
     (format out "\t\tTHE END\n"))
+|#
 (defmethod get-words ((obj _Text))
     (delete nil
         (concatenate  
@@ -100,17 +91,16 @@
             (make-instance '_Punctuation :s sym))
         ((find sym ".!?")
             (make-instance '_PunctuationEnd :s sym))
-        ((is-letter(sym))
+        ((is-letter sym)
             (make-instance '_Symbol :s sym))
         (t 
             (make-instance '_Delimiter :s sym))
     )
 )
 
-(defun print-elements-of-list (list)
-       "Print each element of LIST on a line of its own."
-       (loop for item in list do
-         (print item)))
+(defun parse-storage (storage)
+    (print-list storage)
+)
 
 (defun parse-file(&optional path)
     "Parsing file by its path character by character"
@@ -125,7 +115,9 @@
                 while symbol do 
                     (setq storage (append storage (list (convert-s symbol))))
             )
-            (print-elements-of-list storage)  
+            ; TODO: parse storage
+            (parse-storage storage)
+            ;(print-elements-of-list storage)  
         )
     )
 )
