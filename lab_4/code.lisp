@@ -13,6 +13,8 @@
 )
 (defmethod print-object ((obj _Symbol) out)
     (write-char (s obj)))
+(defmethod comp-c ((mychar character) (obj _Symbol))
+    (char= mychar (s obj)))
 
 (defclass _Delimiter (_Symbol)
     ()
@@ -33,6 +35,8 @@
 )
 (defmethod print-object ((obj _Word) out)
     (print-list(wsl obj)))
+(defmethod count-c ((mychar character) (obj _Word))
+    (count mychar (wsl obj) :test #'comp-c))
 
 (defclass _Sentence ()
     ((swl 
@@ -65,11 +69,9 @@
     (format out "~C~CTHE END" #\tab #\tab))
 
 (defmethod get-words ((obj _Text))
-    (delete nil
-        (concatenate  
-            (map 'list
-                (remove-if-not (lambda (_s) (eq (type-of _s) '_Sentence)) (_s obj))  
-                (lambda (_s _Sentence) (get-words _s)))))    
+    (delete nil  
+        (mapcan (lambda (_s) (get-words _s))
+            (tsl obj)))    
 )
 
 
@@ -147,14 +149,22 @@
     )
 )
 
+(defun show-answer (words)
+    (print words)
+)
 
 (defun run-app()
     "Main function that started application"
-    (let (;(mychar (read-character))
+    (let ((mychar (read-character))
             (text (parse-storage (parse-file))))
+        ; show parsed input
         (print text)
-        ;(format t "~CFILTER CHARACTER: ~C~C" #\newline mychar #\newline)
-        ;(get-words text)
+        ; show selected filter
+        (format t "~CFILTER CHARACTER: ~C~C" #\newline mychar #\newline)
+        (let ((words (get-words text)))
+            ; show words in right order
+            (show-answer (sort words (lambda (w1 w2) (> (count-c mychar w1) (count-c mychar w2)))))
+        )
     )
 )
 
@@ -164,4 +174,4 @@
 
 ; (read-character)
 
-; (write (sort '(2 4 7 3 9 1 5 4 6 3 8) '<))
+;(write (sort '(2 4 7 3 9 1 5 4 6 3 8) '<))
