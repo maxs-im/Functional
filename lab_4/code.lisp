@@ -44,7 +44,6 @@
 )
 
 (defmethod print-object ((obj _Sentence) out)
-    ;(print-unreadable-object (obj out :type t)
     (format out "~C~CSentence~C" #\newline #\tab #\newline)
     (print-list(swl obj)))
 
@@ -62,9 +61,8 @@
 
 (defmethod print-object ((obj _Text) out)
     (format out "~C~CTEXT" #\tab #\tab)
-    ;(print-unreadable-object (obj out :type t)
     (print-list(tsl obj))
-    (format out "~C~C~CTHE END" #\newline #\tab #\tab))
+    (format out "~C~CTHE END" #\tab #\tab))
 
 (defmethod get-words ((obj _Text))
     (delete nil
@@ -101,8 +99,7 @@
 )
 
 (defun parse-storage (storage)
-    ; TODO: change 's
-    (setf storage (append storage (list (make-instance '_PunctuationEnd :s #\.) (make-instance '_Symbol :s #\.))))
+    (setf storage (append storage (list (make-instance '_PunctuationEnd :s #\newline) (make-instance '_Symbol :s #\.))))
     (let ((prev (type-of (car storage)))
             (tbuf '())
             (sbuf '())
@@ -155,9 +152,9 @@
     "Main function that started application"
     (let (;(mychar (read-character))
             (text (parse-storage (parse-file))))
-        ;(print text)
+        (print text)
         ;(format t "~CFILTER CHARACTER: ~C~C" #\newline mychar #\newline)
-        (get-words text)
+        ;(get-words text)
     )
 )
 
