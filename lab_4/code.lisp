@@ -13,8 +13,6 @@
 )
 (defmethod print-object ((obj _Symbol) out)
     (write-char (s obj)))
-(defmethod comp-c ((mychar character) (obj _Symbol))
-    (char= mychar (s obj)))
 
 (defclass _Delimiter (_Symbol)
     ()
@@ -36,7 +34,7 @@
 (defmethod print-object ((obj _Word) out)
     (print-list(wsl obj)))
 (defmethod count-c ((mychar character) (obj _Word))
-    (count mychar (wsl obj) :test #'comp-c))
+    (count mychar (wsl obj) :test (lambda (c _s) (char= c (s _s)))))
 
 (defclass _Sentence ()
     ((swl 
@@ -153,6 +151,28 @@
     (loop for i from 1 to (list-length words) do
         (format t "~D: ~a~C" i (nth (- i 1) words) #\newline)))
 
+(defun compare-symbolsl (l1 l2)
+    (let ((ll1 (list-length l1))
+            (ll2 (list-length l2)))
+        (loop for i from 0 to (- (min ll1 ll2) 1) do
+            (let ((s1 (s (nth i l1)))
+                    (s2 (s (nth i l2))))
+                (if (char/= s1 s2)
+                    (return-from compare-symbolsl (char< s1 s2)))
+            ))
+        (return-from compare-symbolsl (<= ll1 ll2)))
+)
+
+(defun compare-words (w1 w2 mychar)
+    (let ((w1c (count-c mychar w1))
+        (w2c (count-c mychar w2)))
+        (if (= w1c w2c)
+            (compare-symbolsl (wsl w1) (wsl w2))
+            (> w1c w2c)
+        )
+    )   
+)
+
 (defun run-app()
     "Main function that started application"
     (let ((mychar (read-character))
@@ -163,15 +183,10 @@
         (format t "~CFILTER CHARACTER: ~C~C" #\newline mychar #\newline)
         (let ((words (get-words text)))
             ; show words in right order
-            (show-answer (sort words (lambda (w1 w2) (> (count-c mychar w1) (count-c mychar w2)))))
+            (show-answer (sort words (lambda (w1 w2) (compare-words w1 w2 mychar))))
         )
     )
 )
 
 ; Entrance
 (run-app)
-
-
-; (read-character)
-
-;(write (sort '(2 4 7 3 9 1 5 4 6 3 8) '<))
