@@ -150,8 +150,8 @@
 )
 
 (defun show-answer (words)
-    (print words)
-)
+    (loop for i from 1 to (list-length words) do
+        (format t "~D: ~a~C" i (nth (- i 1) words) #\newline)))
 
 (defun run-app()
     "Main function that started application"
