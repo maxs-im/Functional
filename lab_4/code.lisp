@@ -27,6 +27,7 @@
     ((wsl
         :initform '()
         :type :list
+        :initarg :wsl
         :accessor wsl)
     )
 )
@@ -37,6 +38,7 @@
     ((swl 
         :initform '()
         :type :list
+        :initarg :swl
         :accessor swl)
     )
 )
@@ -46,27 +48,28 @@
         (print-list(swl obj))))
 |#
 (defmethod get-words ((obj _Sentence))
-    (remove-if-not (lambda (sw) (eq (typeof sw) '_Word)) (swl obj)))
+    (remove-if-not (lambda (sw) (eq (type-of sw) '_Word)) (swl obj)))
 
 (defclass _Text ()
     ((tsl
         :initform '()
         :type :list
+        :initarg :tsl
         :accessor tsl)
     )
 )
-#|
+
 (defmethod print-object ((obj _Text) out)
     (format out "\t\tTEXT\n")
     (print-unreadable-object (obj out :type t)
         (print-list(tsl obj)))
     (format out "\t\tTHE END\n"))
-|#
+
 (defmethod get-words ((obj _Text))
     (delete nil
         (concatenate  
             (map 'list
-                (remove-if-not (lambda (_s) (eq (typeof _s) '_Sentence)) (_s obj))  
+                (remove-if-not (lambda (_s) (eq (type-of _s) '_Sentence)) (_s obj))  
                 (lambda (_s _Sentence) (get-words _s)))))    
 )
 
@@ -97,11 +100,33 @@
 )
 
 (defun parse-storage (storage)
-    ; (print-list storage)
-    (let ((cur_text (make-instance '_Text)) (cur_word (make-instance '_Word)) (cur_sen (make-instance '_Sentence)))
-        (loop for item in storage do
-            (write item)
+    ; TODO: change 's
+    (setf storage (append storage (list (make-instance '_PunctuationEnd :s 's) (make-instance '_Symbol :s 's))))
+    (let ((prev (type-of (car storage)))
+            (tbuf '())
+            (sbuf '())
+            (buf '()))
+        (loop for item in storage do    
+            (if (eq prev (type-of item))
+                (setf buf (append buf (list item)))
+                (progn
+                    (case prev        
+                        ('_Symbol
+                            (setf sbuf (append sbuf (list (make-instance '_Word :wsl buf)))))
+                        ('_PunctuationEnd
+                            (setf tbuf (append tbuf (list (make-instance '_Sentence :swl (append sbuf buf)))))
+                            (setf sbuf '())
+                        )
+                        ; Delimeter + Punctuation
+                        (t 
+                            (setf sbuf (append sbuf buf)))
+                    )
+                    (setf buf (list item))
+                )
+            )
+            (setf prev (type-of item))
         )
+        (return-from parse-storage (make-instance '_Text :tsl tbuf))
     )
 )
 
@@ -116,10 +141,10 @@
         (let ((storage '()))
             (loop for symbol = (read-char stream nil)
                 while symbol do 
-                    (setq storage (append storage (list (convert-s symbol))))
+                    (setf storage (append storage (list (convert-s symbol))))
             )
             ; TODO: parse storage
-            (parse-storage storage)  
+            (print (parse-storage storage))
         )
     )
 )
@@ -139,7 +164,5 @@
 
 ; (read-character)
 (parse-file())
-
-
 
 ; (write (sort '(2 4 7 3 9 1 5 4 6 3 8) '<))
