@@ -16,4 +16,4 @@ Original text: **Разработать информационную систе�
 
 - **Maxim Galchenko** (@maxs-im)
 
-[Github Repository](https://github.com/plartem/practice)
+[Github Repository](https://github.com/maxs-im/Functional/tree/master/lab_1)
