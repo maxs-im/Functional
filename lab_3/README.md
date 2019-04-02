@@ -7,7 +7,7 @@ Create a Lisp graphics application that meets the following requirements:
 1. Use the OOP features: classes, inheritance, polymorphism, encapsulation, multimethods.
 2. Each class must have an exhaustive meaning of the name and informative composition.
 3. Inheritance should be applied only when it makes sense.
-Files can be used to store initialization parameters.
+4. Files can be used to store initialization parameters.
 
 ### Task
 
