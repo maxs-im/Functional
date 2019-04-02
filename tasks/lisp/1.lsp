@@ -60,12 +60,12 @@
                     ; Finish
                     seq)))))
 (defun print-step (arrow x y) 
-    (format t "Step: (~D; ~D) ~A ~C" x y arrow #\newline))
+    (format t "Step: (~D; ~D) ~A ~&" x y arrow))
 
 (defun find-path ()
     (let ((seq (do-step (list 0)))
             (x 0) (y 0))
-        (format t "Maximum score is ~D~C" (car seq) #\newline)
+        (format t "Maximum score is ~D~&" (car seq))
         (dolist (s (cdr seq))
             (case s
                 (1 (progn

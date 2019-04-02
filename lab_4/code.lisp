@@ -46,7 +46,7 @@
 )
 
 (defmethod print-object ((obj _Sentence) out)
-    (format out "~C~CSentence~C" #\newline #\tab #\newline)
+    (format out "~&~CSentence~&" #\tab)
     (print-list(swl obj)))
 
 (defmethod get-words ((obj _Sentence))
@@ -149,7 +149,7 @@
 
 (defun show-answer (words)
     (loop for i from 1 to (list-length words) do
-        (format t "~D: ~a~C" i (nth (- i 1) words) #\newline)))
+        (format t "~D: ~a~&" i (nth (- i 1) words))))
 
 (defun compare-symbolsl (l1 l2)
     (let ((ll1 (list-length l1))
@@ -180,7 +180,7 @@
         ; show parsed input
         (print text)
         ; show selected filter
-        (format t "~CFILTER CHARACTER: ~C~C" #\newline mychar #\newline)
+        (format t "~&FILTER CHARACTER: ~C~&" mychar)
         (let ((words (get-words text)))
             ; show words in right order
             (show-answer (sort words (lambda (w1 w2) (compare-words w1 w2 mychar))))
