@@ -8,8 +8,7 @@ Create a text processing program for a textbook on programming (which is in a fi
 
 Sort the words in the text in descending order of the number of occurrences of a given character, and in the case of equality - alphabetically.
 
-Original text: **Отсортировать слова в тексте по убыванию количества вхождений заданного символа, а в случае равенства – по алфавиту.**
-
+Original text: _Отсортировать слова в тексте по убыванию количества вхождений заданного символа, а в случае равенства – по алфавиту._
 
 ## Author & Link
 
