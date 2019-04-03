@@ -29,7 +29,7 @@
                 (3 (setf (values x y) (values (+ x 1) (+ y 1))))
                 (t (error "Incorrect step"))))
             (if (and (< x *n*) (< y *m*))
-                (nth (+ (* *n* x) y) *matrix*)
+                (nth (+ (* *n* y) x) *matrix*)
                 nil)))
 
 ; 1 -> right; 2 -> down; 3 -> right-down
@@ -53,12 +53,12 @@
                         (if win
                             (if (> (car d) (car win))
                                 (setq win d))
-                            (setq win d))
-                        (setq win d)))
+                            (setq win d))))
                 (if win
                     win
                     ; Finish
                     seq)))))
+
 (defun print-step (arrow x y) 
     (format t "Step: (~D; ~D) ~A ~&" x y arrow))
 
