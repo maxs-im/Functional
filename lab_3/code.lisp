@@ -1,11 +1,14 @@
 ; package loader
 (load "~/quicklisp/setup.lisp")
 (ql:quickload "ltk")
+; load my theme classes
+(load "lab_3/myclasses.lisp")
 
 (require "ltk")
 ; use gui library
 (in-package #:ltk)
 
+; small ideas
 ;(make-instance 'toplevel)
 ;(wm-title *tk* 'KEK)
 ;(on-close *tk* (lambda () (progn (format t "CLOSE") (destroy *tk*))))
@@ -23,9 +26,9 @@
                              :master f
                              :text "Button 2"
                              :command (lambda () (format t "Button2~&"))))
-          (l1 (make-instance 'listbox
+          (l1 (make-instance 'button
                             :master f
-                            :listvariable '()
+                            ;:listvariable '()
                             :command (lambda (x) (print x))
                            
                             ))                
