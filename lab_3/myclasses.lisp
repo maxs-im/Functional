@@ -76,9 +76,18 @@
 (defun filterinname (toys sub-name)
     (remove-if-not (lambda (t0) (search sub-name (name t0) :test 'char=)) toys))
 
-; create/delete toy in storage
+; create/delete toy in storage and control the budget
+(defun update-budget (new-price) 
+    (if (check-budget (- *budget* new-price)))
+        (setq *budget* new-price))
+(defun check-budget (price-to-add)
+    (>= (- *budget* (reduce (lambda (s1 s2) (+ (read-price s1) (read-price s2))) *storage*)) price-to-add)
 (defun add-toy (toy name age price)
-    (setq *storage* (cons (make-instance toy :name name :age age :price price) *storage*)))
+    (let ((available (check-budget price)))
+        (if available
+            (setq *storage* (cons (make-instance toy :name name :age age :price price) *storage*)))
+        available
+    ))
 (defun delete-toy ()
     (setq *storage* (cdr *storage*)))
 
