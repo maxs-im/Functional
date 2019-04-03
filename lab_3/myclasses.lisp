@@ -21,20 +21,28 @@
 (defmethod toy2str ((obj Toy))
     (format nil "~A for ~S(up to ~D) with price ~D" 
         (get-name obj) (get-age obj) (read-age obj) (read-price obj)))
+(defmethod description ((obj Toy))
+    "Toy for children garden")
 
 (defclass Ball (Toy)
     ())
+(defmethod description((obj Ball))
+    "Sport equipment")
 
 (defclass Machine (Toy)
     ())
+(defmethod description((obj Machine))
+    "Boys loved it")
 
 (defclass Constructor (Toy)
     ())
-(defmethod get-name ((obj Constructor))
-    (format nil "Constructor of ~A" (name obj)))
+(defmethod description((obj Constructor))
+    "Are you an architect?")
 
 (defclass Doll (Toy)
     ())
+(defmethod description((obj Doll))
+    "Girls loved it")
 
 ; user data
 (defparameter *storage* '())
@@ -70,10 +78,11 @@
 #|
 ; testing
 (let ((m (make-instance 'Constructor :price 100 :name "lod" :age 5)))
-    (print (get-name m)))
+    (print (description m)))
 
 (print (filterinname *storage* "ll"))
 |#
+
 
 ; create/delete toy in storage
 (defun add-toy (toy name age price)
