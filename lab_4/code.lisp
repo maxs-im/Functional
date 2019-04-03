@@ -34,7 +34,7 @@
 (defmethod print-object ((obj _Word) out)
     (print-list(wsl obj)))
 (defmethod count-c ((mychar character) (obj _Word))
-    (count mychar (wsl obj) :test (lambda (c _s) (char= c (s _s)))))
+    (count mychar (wsl obj) :test (lambda (c _s) (char-equal c (s _s)))))
 
 (defclass _Sentence ()
     ((swl 
@@ -157,8 +157,8 @@
         (loop for i from 0 to (- (min ll1 ll2) 1) do
             (let ((s1 (s (nth i l1)))
                     (s2 (s (nth i l2))))
-                (if (char/= s1 s2)
-                    (return-from compare-symbolsl (char< s1 s2)))
+                (if (char-not-equal s1 s2)
+                    (return-from compare-symbolsl (char-lessp s1 s2)))
             ))
         (return-from compare-symbolsl (<= ll1 ll2)))
 )
@@ -181,9 +181,11 @@
         (print text)
         ; show selected filter
         (format t "~&FILTER CHARACTER: ~C~&" mychar)
-        (let ((words (get-words text)))
+        (let* ((words (get-words text))
+            (sortedwords (sort words (lambda (w1 w2) (compare-words w1 w2 mychar)))))
             ; show words in right order
-            (show-answer (sort words (lambda (w1 w2) (compare-words w1 w2 mychar))))
+            (show-answer 
+                (remove-if-not (lambda (w) (/= (count-c mychar w) 0)) sortedwords))
         )
     )
 )
