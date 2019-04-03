@@ -19,7 +19,7 @@
 (defmethod get-name ((obj Toy))
     (format nil "~A (~S)" (name obj) (type-of obj)))
 (defmethod toy2str ((obj Toy))
-    (format nil "~A for ~S(up to ~D) with price ~D" 
+    (format nil "~A for ~A (up to ~D) with price ~D" 
         (get-name obj) (get-age obj) (read-age obj) (read-price obj)))
 (defmethod description ((obj Toy))
     "Toy for children garden")
@@ -48,15 +48,16 @@
 (defparameter *storage* '())
 (defparameter *budget* 10000)
 
+; default values
 (setf *storage* (list
-    (make-instance 'Ball :name "llab1" :age 7 :price 100)
-    (make-instance 'Machine :name "enicham1" :age 9 :price 2000)
-    (make-instance 'Constructor :name "rotcurtsnoc1" :age 5 :price 150)
-    (make-instance 'Doll :name "llod1" :age 15 :price 50)
-    (make-instance 'Ball :name "llab1" :age 10 :price 250)
-    (make-instance 'Machine :name "enicham1" :age 20 :price 100)
-    (make-instance 'Constructor :name "rotcurtsnoc1" :age 3 :price 5)
-    (make-instance 'Doll :name "llod1" :age 2 :price 250)))
+    (make-instance 'Ball :name "llaB1" :age 7 :price 100)
+    (make-instance 'Machine :name "enichaM1" :age 9 :price 2000)
+    (make-instance 'Constructor :name "rotcurtsnoC1" :age 5 :price 150)
+    (make-instance 'Doll :name "lloD1" :age 15 :price 50)
+    (make-instance 'Ball :name "llaD1" :age 10 :price 250)
+    (make-instance 'Machine :name "enichaM1" :age 20 :price 100)
+    (make-instance 'Constructor :name "rotcurtsnoC1" :age 3 :price 5)
+    (make-instance 'Doll :name "lloD1" :age 2 :price 250)))
 
 
 ; sorting functions
@@ -75,54 +76,53 @@
 (defun filterinname (toys sub-name)
     (remove-if-not (lambda (t0) (search sub-name (name t0) :test 'char=)) toys))
 
-#|
-; testing
-(let ((m (make-instance 'Constructor :price 100 :name "lod" :age 5)))
-    (print (description m)))
-
-(print (filterinname *storage* "ll"))
-|#
-
-
 ; create/delete toy in storage
 (defun add-toy (toy name age price)
     (setq *storage* (cons (make-instance toy :name name :age age :price price) *storage*)))
 (defun delete-toy ()
     (setq *storage* (cdr *storage*)))
 
-#|
+; save/load progress (in storage)
 (defun read-data-from-file ()
-    (with-open-file (stream *PATH* :direction :input)
-        (loop for toy-t = (read stream nil nil)
-            while toy-t
-                collect (let* (
-                    (name (read stream nil nil))
-                    (age (read stream nil nil))
-                    (price (read stream nil nil)))
-                    (make-instance toy-t 
-                        :name name
-                        :age age
-                        :price price)))))
-                    
-
-(defun set-data()
-    (let ((data (read-data-from-file)))
-        (if data 
+    (let ((data
+        (with-open-file (stream *PATH* :direction :input)
+            (loop for toy-t = (read stream nil nil)
+                while toy-t
+                    collect (let* (
+                        (name (read stream nil nil))
+                        (age (read stream nil nil))
+                        (price (read stream nil nil)))
+                        (make-instance toy-t 
+                            :name name
+                            :age age
+                            :price price))))))
+        (if data
             (setq *storage* data))))
-
 (defun save-data-to-file ()
     (with-open-file (stream *PATH* :direction :output
             :if-does-not-exist :create
             :if-exists :supersede)
         (loop for item in *storage* do
             ; NOTE: use return for windows
-            (format stream "~A ~A ~D ~D~C~&" (type-of item) (name item) (read-age item) (read-price item) #\return))))
+            (format stream "~A ~S ~D ~D~C~&" (type-of item) (name item) (read-age item) (read-price item) #\return))))
 
-
+#|
+; testing progress
+(print (toy2str (car *storage*)))
 (save-data-to-file)
 (print *storage*)
-(set-data)
+(print (toy2str (car *storage*)))
+(read-data-from-file)
 (print "____________________")
 (print *storage*)
+(print (toy2str (car *storage*)))
 (save-data-to-file)
+|#
+
+#|
+; testing different
+(let ((m (make-instance 'Constructor :price 100 :name "lod" :age 5)))
+    (print (description m)))
+
+(print (filterinname *storage* "ll"))
 |#
