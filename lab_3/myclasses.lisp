@@ -11,7 +11,6 @@
         (t "Adult")))
 
 (defclass Toy ()
-    ; TODO: test price!
     ((price :reader read-price :initarg :price :initform 0 :type number)
         (name :accessor name :initarg :name :type string)
         (age :reader read-age :accessor age :initarg :age :initform 22 :type fixnum)))
@@ -76,6 +75,13 @@
 (print (filterinname *storage* "ll"))
 |#
 
+; create/delete toy in storage
+(defun add-toy (toy name age price)
+    (setq *storage* (cons (make-instance toy :name name :age age :price price) *storage*)))
+(defun delete-toy ()
+    (setq *storage* (cdr *storage*)))
+
+#|
 (defun read-data-from-file ()
     (with-open-file (stream *PATH* :direction :input)
         (loop for toy-t = (read stream nil nil)
@@ -110,3 +116,4 @@
 (print "____________________")
 (print *storage*)
 (save-data-to-file)
+|#
