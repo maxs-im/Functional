@@ -1,3 +1,5 @@
+(defconstant *PATH* #P"lab_3/data.txt")
+
 (defun parse-age (val)
     (cond 
         ((<= val 1) "Baby")
@@ -9,9 +11,10 @@
         (t "Adult")))
 
 (defclass Toy ()
-    ((price :reader read-price :initarg :price :initform 0)
+    ; TODO: test price!
+    ((price :reader read-price :initarg :price :initform 0 :type number)
         (name :accessor name :initarg :name :type string)
-        (age :reader read-age :accessor age :initarg :age :initform 22)))
+        (age :reader read-age :accessor age :initarg :age :initform 22 :type fixnum)))
 (defmethod get-age ((obj Toy))
     (parse-age (age obj)))
 (defmethod get-name ((obj Toy))
@@ -65,8 +68,45 @@
 (defun filterinname (toys sub-name)
     (remove-if-not (lambda (t0) (search sub-name (name t0) :test 'char=)) toys))
 
+#|
 ; testing
 (let ((m (make-instance 'Constructor :price 100 :name "lod" :age 5)))
     (print (get-name m)))
 
 (print (filterinname *storage* "ll"))
+|#
+
+(defun read-data-from-file ()
+    (with-open-file (stream *PATH* :direction :input)
+        (loop for toy-t = (read stream nil nil)
+            while toy-t
+                collect (let* (
+                    (name (read stream nil nil))
+                    (age (read stream nil nil))
+                    (price (read stream nil nil)))
+                    (make-instance toy-t 
+                        :name name
+                        :age age
+                        :price price)))))
+                    
+
+(defun set-data()
+    (let ((data (read-data-from-file)))
+        (if data 
+            (setq *storage* data))))
+
+(defun save-data-to-file ()
+    (with-open-file (stream *PATH* :direction :output
+            :if-does-not-exist :create
+            :if-exists :supersede)
+        (loop for item in *storage* do
+            ; NOTE: use return for windows
+            (format stream "~A ~A ~D ~D~C~&" (type-of item) (name item) (read-age item) (read-price item) #\return))))
+
+
+(save-data-to-file)
+(print *storage*)
+(set-data)
+(print "____________________")
+(print *storage*)
+(save-data-to-file)
