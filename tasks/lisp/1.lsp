@@ -51,7 +51,7 @@
                 (dolist (d (list d1 d2 d3))
                     (if d
                         (if win
-                            (if (> (car d) (car win))
+                            (if (< (car d) (car win))
                                 (setq win d))
                             (setq win d))))
                 (if win
