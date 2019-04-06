@@ -1,5 +1,3 @@
-(defconstant *PATH* #P"lab_3/data.txt")
-
 (defun parse-age (val)
     (cond 
         ((<= val 1) "Baby")
@@ -87,15 +85,17 @@
 (defun add-toy (toy name age price)
     (let ((available (check-budget price)))
         (if available
-            (setq *storage* (cons (make-instance toy :name name :age age :price price) *storage*)))
+            (let ((item (make-instance toy :name name :age age :price price)))
+                (format t "Description: ~a~&" (description item))
+                (setq *storage* (cons item *storage*))))
         available))
 (defun delete-toy ()
     (setq *storage* (cdr *storage*)))
 
 ; save/load progress (in storage)
-(defun read-data-from-file ()
+(defun read-data-from-file (path)
     (let ((data
-        (with-open-file (stream *PATH* :direction :input)
+        (with-open-file (stream path :direction :input)
             (loop for toy-t = (read stream nil nil)
                 while toy-t
                     collect (let* (
@@ -108,31 +108,10 @@
                             :price price))))))
         (if data
             (setq *storage* data))))
-(defun save-data-to-file ()
-    (with-open-file (stream *PATH* :direction :output
+(defun save-data-to-file (path)
+    (with-open-file (stream path :direction :output
             :if-does-not-exist :create
             :if-exists :supersede)
         (loop for item in *storage* do
             ; NOTE: use return for windows
             (format stream "~A ~S ~D ~D~C~&" (type-of item) (name item) (read-age item) (read-price item) #\return))))
-
-#|
-; testing progress
-(print (toy2str (car *storage*)))
-(save-data-to-file)
-(print *storage*)
-(print (toy2str (car *storage*)))
-(read-data-from-file)
-(print "____________________")
-(print *storage*)
-(print (toy2str (car *storage*)))
-(save-data-to-file)
-|#
-
-#|
-; testing different
-(let ((m (make-instance 'Constructor :price 100 :name "lod" :age 5)))
-    (print (description m)))
-
-(print (filterinname *storage* "ll"))
-|#
