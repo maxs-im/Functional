@@ -19,8 +19,11 @@
                 (declare (ignore event))
                 (setf *exit-mainloop* t)))
         (let* ((f (make-instance 'frame))
+            ; Panel
+            (fpanel (make-instance 'frame :master f))
+
             ; input
-            (fparams (make-instance 'frame :master f))
+            (fparams (make-instance 'frame :master fpanel))
 
             ; radio toy-type select
             (fradio (make-instance 'frame :master fparams))
@@ -110,7 +113,7 @@
                             (format t "update budget~&"))))
             
             ; control
-            (fcontrol (make-instance 'frame :master f))
+            (fcontrol (make-instance 'frame :master fpanel))
 
             (fsort (make-instance 'frame :master fcontrol))
                 (b-sp (make-instance 'button
@@ -170,6 +173,15 @@
                             :command (lambda () 
                                    (format t "reset view") ;(reset-view)
                                    )))
+
+            ; View
+            (fview (make-instance 'frame :master f))
+            (lview  (make-instance 'label
+                        :master fview
+                        :text '(concatenate 'string 
+                            (loop for toy in *storage*
+                                while toy
+                                    collect (format nil "~s~&" (toy2str toy))))))
         )
         (declare (ignore mf-exit mf-save mf-load sepm))
         
@@ -219,8 +231,16 @@
             (pack ftoy :side :top :pady 10)
             (pack (list b-add b-delete b-reset) :side :left)
     
-        
-        
+        (pack fview :side :right :fill :both)
+            (configure fview :borderwidth 5)
+            ;(configure fview :background :blue)
+            (configure fview :relief :solid)
+
+            (pack lview)
+
+        (pack fpanel :side :left)
+            (configure fpanel :borderwidth 5)
+            (configure fpanel :relief :raised)
         
         (pack f)
         (configure f :borderwidth 3)
