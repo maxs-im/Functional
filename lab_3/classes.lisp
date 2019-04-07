@@ -1,3 +1,5 @@
+(defparameter *FILE* "data.txt")
+
 (defun parse-age (val)
     (cond 
         ((<= val 1) "Baby")
@@ -93,9 +95,9 @@
     (setq *storage* (cdr *storage*)))
 
 ; save/load progress (in storage)
-(defun read-data-from-file (path)
-    (let ((data
-        (with-open-file (stream path :direction :input)
+(defun read-data-from-file ()
+    (let* ((dir-path (directory-namestring *load-pathname*))
+        (data (with-open-file (stream (concatenate 'string dir-path *FILE*) :direction :input)
             (loop for toy-t = (read stream nil nil)
                 while toy-t
                     collect (let* (
@@ -108,10 +110,11 @@
                             :price price))))))
         (if data
             (setq *storage* data))))
-(defun save-data-to-file (path)
-    (with-open-file (stream path :direction :output
-            :if-does-not-exist :create
-            :if-exists :supersede)
-        (loop for item in *storage* do
-            ; NOTE: use return for windows
-            (format stream "~A ~S ~D ~D~C~&" (type-of item) (name item) (read-age item) (read-price item) #\return))))
+(defun save-data-to-file ()
+    (let ((dir-path (directory-namestring *load-pathname*)))
+        (with-open-file (stream (concatenate 'string dir-path *FILE*) :direction :output
+                :if-does-not-exist :create
+                :if-exists :supersede)
+            (loop for item in *storage* do
+                ; NOTE: use return for windows
+                (format stream "~A ~S ~D ~D~C~&" (type-of item) (name item) (read-age item) (read-price item) #\return)))))
