@@ -93,6 +93,22 @@
                         :master fage
 	                    :text 0
 	                    :validate :key))
+
+            ; Budget
+            (fbudget (make-instance 'frame :master fparams))
+            (lbudget (make-instance 'label
+                        :master fbudget
+                        :text "Update budget: "))
+            (i-b (make-instance 'entry 
+                        :master fbudget
+                        :text *budget*
+                        :validate :key))
+            (b-b (make-instance 'button
+                        :master fbudget
+                        :text "UPDATE"
+                        :command (lambda () 
+                            (format t "update budget~&"))))
+            
         )
         (declare (ignore mf-exit mf-save mf-load sepm))
         
@@ -112,6 +128,11 @@
             (pack (list lprice i-pf i-pt) :side :left)
             (pack fage :side :top :fill :x)
             (pack (list lage i-af i-at) :side :left)
+
+            (pack fbudget :side :top :fill :x)
+            (configure fbudget :borderwidth 5)
+            (configure fbudget :relief :sunken)
+            (pack (list lbudget i-b b-b) :side :left)
         
             ; validate each integer input
             (format-wish "~A configure -validatecommand {string is int %P}"
@@ -121,7 +142,10 @@
             (format-wish "~A configure -validatecommand {string is int %P}"
                 (widget-path i-af))
             (format-wish "~A configure -validatecommand {string is int %P}"
-                (widget-path i-at))    
+                (widget-path i-at))
+            (format-wish "~A configure -validatecommand {string is int %P}"
+                (widget-path i-b))
+    
         
         
         
