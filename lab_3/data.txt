@@ -1,8 +1,3 @@
+10000
 BALL "llaB1" 7 100
 MACHINE "enichaM1" 9 2000
-CONSTRUCTOR "rotcurtsnoC1" 5 150
-DOLL "lloD1" 15 50
-BALL "llaD1" 10 250
-MACHINE "enichaM1" 20 100
-CONSTRUCTOR "rotcurtsnoC1" 3 5
-DOLL "lloD1" 2 250

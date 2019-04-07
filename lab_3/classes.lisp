@@ -46,7 +46,7 @@
 
 ; user data
 (defparameter *storage* '())
-(defparameter *budget* 10000)
+(defparameter *budget* nil)
 
 ; default values
 (setf *storage* (list
@@ -58,7 +58,7 @@
     (make-instance 'Machine :name "enichaM1" :age 20 :price 100)
     (make-instance 'Constructor :name "rotcurtsnoC1" :age 3 :price 5)
     (make-instance 'Doll :name "lloD1" :age 2 :price 250)))
-
+(setq *budget* 10000)
 
 ; sorting functions
 (defun sortbyprice (toys)
@@ -96,8 +96,10 @@
 
 ; save/load progress (in storage)
 (defun read-data-from-file ()
-    (let* ((dir-path (directory-namestring *load-pathname*))
-        (data (with-open-file (stream (concatenate 'string dir-path *FILE*) :direction :input)
+    (let ((dir-path (directory-namestring *load-pathname*)))
+        (with-open-file (stream (concatenate 'string dir-path *FILE*) :direction :input)
+            (let* ((tmp-budget (read stream nil nil))
+                (data
             (loop for toy-t = (read stream nil nil)
                 while toy-t
                     collect (let* (
@@ -107,14 +109,18 @@
                         (make-instance toy-t 
                             :name name
                             :age age
-                            :price price))))))
-        (if data
-            (setq *storage* data))))
+                            :price price)))))
+        (if tmp-budget
+            (progn (setq *budget* tmp-budget)
+                (if data
+                    (setq *storage* data))))))))
+
 (defun save-data-to-file ()
     (let ((dir-path (directory-namestring *load-pathname*)))
         (with-open-file (stream (concatenate 'string dir-path *FILE*) :direction :output
                 :if-does-not-exist :create
                 :if-exists :supersede)
+            (format stream "~D~C~&" *budget* #\return)
             (loop for item in *storage* do
                 ; NOTE: use return for windows
                 (format stream "~A ~S ~D ~D~C~&" (type-of item) (name item) (read-age item) (read-price item) #\return)))))
