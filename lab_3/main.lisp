@@ -109,6 +109,67 @@
                         :command (lambda () 
                             (format t "update budget~&"))))
             
+            ; control
+            (fcontrol (make-instance 'frame :master f))
+
+            (fsort (make-instance 'frame :master fcontrol))
+                (b-sp (make-instance 'button
+                            :master fsort
+                            :text "Sort by Price"
+                            :command (lambda () 
+                                   (format t "sort price") ;(set-new-view (sortbyprice *view-storage*))
+                                   )))
+                (b-sa (make-instance 'button
+                            :master fsort
+                            :text "Sort by Age"
+                            :command (lambda () 
+                            (format t "sort age")    ;(set-new-view (sortbyage *view-storage*))
+                            )))
+                (b-sn (make-instance 'button
+                            :master fsort
+                            :text "Sort by Name"
+                            :command (lambda () 
+                                   (format t "sort name")   ;(set-new-view (filterinprice *view-storage*))
+                                   )))
+            (ffilter (make-instance 'frame :master fcontrol))
+                (b-fp (make-instance 'button
+                            :master ffilter
+                            :text "Filter by Price"
+                            :command (lambda () 
+                                   (format t "filter price") ;(set-new-view (filterinprice *view-storage* (text i-fp) (text i-tp)))
+                                   )))
+                (b-fa (make-instance 'button
+                            :master ffilter
+                            :text "Filter by Age"
+                            :command (lambda () 
+                                   (format t "filter age") ;(set-new-view (filterinage *view-storage* (text i-fa) (text i-ta))))
+                                   )))
+                (b-fn (make-instance 'button
+                            :master ffilter
+                            :text "Filter by Name"
+                            :command (lambda () 
+                                   (format t "filter name") ;(set-new-view (filterinname *view-storage* (text i-n)))
+                                   )))
+
+            (ftoy (make-instance 'frame :master fcontrol))
+                (b-delete (make-instance 'button
+                            :master ftoy
+                            :text "Delete Toy"
+                            :command (lambda () 
+                                   (format t "delete toy") ;(if (add-toy ? (text i-n) (text i-fa) (text i-fp)) (reset-view))
+                                   )))
+                (b-add (make-instance 'button
+                            :master ftoy
+                            :text "Add Toy"
+                            :command (lambda () 
+                                   (format t "add toy") ;(progn (delete-toy) (reset-view))
+                                   )))
+                (b-reset (make-instance 'button
+                            :master ftoy
+                            :text "Reset view"
+                            :command (lambda () 
+                                   (format t "reset view") ;(reset-view)
+                                   )))
         )
         (declare (ignore mf-exit mf-save mf-load sepm))
         
@@ -145,6 +206,18 @@
                 (widget-path i-at))
             (format-wish "~A configure -validatecommand {string is int %P}"
                 (widget-path i-b))
+    
+    
+        (pack fcontrol :side :top)
+            
+            (pack fsort :side :top)
+            (pack (list b-sn b-sp b-sa) :side :left)
+
+            (pack ffilter :side :top :pady 10)
+            (pack (list b-fn b-fp b-fa) :side :left)
+            
+            (pack ftoy :side :top :pady 10)
+            (pack (list b-add b-delete b-reset) :side :left)
     
         
         
