@@ -14,7 +14,24 @@
 (defun gui ()
     (with-ltk ()
         (let* ((f (make-instance 'frame))
-            )
+            ; menu for save  
+            (mb (make-menubar))
+            (mfile (make-menu mb "File" ))
+            (mf-load (make-menubutton mfile "Load" (lambda ()
+                                (read-data-from-file))
+                        :underline 1))
+            (mf-save (make-menubutton mfile "Save" (lambda ()
+                                (save-data-to-file))
+                        :underline 1))
+            (sepm (add-separator mfile))   
+            (mf-exit (make-menubutton mfile "Exit" (lambda () (setf *exit-mainloop* t))
+                        :underline 1
+                        :accelerator "Ctrl Q"))
+        )
+        (declare (ignore mf-exit mf-save mf-load sepm))
+        ; exit key combination
+        ; TODO: fix for Windows
+        (bind *tk* "<Control-q>" (lambda (event) (declare (ignore event)) (setf *exit-mainloop* t)))
         (wm-title *tk* "Game room")
 
         (pack f)
