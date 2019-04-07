@@ -11,6 +11,22 @@
 ; init data
 (read-data-from-file)
 
+(defvar *view-storage* *storage*)
+(defun set-new-view (label elements)
+    (setf (text label) (print-toys elements))
+    (setq *view-storage* elements))
+(defun reset-view (label)
+    (set-new-view label *storage*))
+
+(defun print-toys (toys)
+    (format nil "~{~A~^;~&~}"
+        (let ((index 0))
+            (mapcar 
+                (lambda (item) 
+                    (progn (incf index)
+                        (format nil "~d: ~a" index (toy2str item)))) 
+                toys))))
+
 (defun gui ()
     (with-ltk ()
         (wm-title *tk* "Game room")
@@ -19,6 +35,12 @@
                 (declare (ignore event))
                 (setf *exit-mainloop* t)))
         (let* ((f (make-instance 'frame))
+            ; View
+            (fview (make-instance 'frame :master f))
+            (lview  (make-instance 'label
+                        :master fview
+                        :text (print-toys *view-storage*)))
+
             ; Panel
             (fpanel (make-instance 'frame :master f))
 
@@ -51,7 +73,7 @@
             (mb (make-menubar))
             (mfile (make-menu mb "File" ))
             (mf-load (make-menubutton mfile "Load" (lambda ()
-                                (read-data-from-file))
+                                (progn (read-data-from-file) (reset-view lview)))
                         :underline 1))
             (mf-save (make-menubutton mfile "Save" (lambda ()
                                 (save-data-to-file))
@@ -101,7 +123,7 @@
             (fbudget (make-instance 'frame :master fparams))
             (lbudget (make-instance 'label
                         :master fbudget
-                        :text "Update budget: "))
+                        :text "Budget: "))
             (i-b (make-instance 'entry 
                         :master fbudget
                         :text *budget*
@@ -110,7 +132,8 @@
                         :master fbudget
                         :text "UPDATE"
                         :command (lambda () 
-                            (format t "update budget~&"))))
+                            (format t "update budget~&") ;(progn (if (update-budget (text i-b)) (update-view-budget)))
+                            )))
             
             ; control
             (fcontrol (make-instance 'frame :master fpanel))
@@ -120,38 +143,38 @@
                             :master fsort
                             :text "Sort by Price"
                             :command (lambda () 
-                                   (format t "sort price") ;(set-new-view (sortbyprice *view-storage*))
+                                   (set-new-view lview (sortbyprice *view-storage*))
                                    )))
                 (b-sa (make-instance 'button
                             :master fsort
                             :text "Sort by Age"
                             :command (lambda () 
-                            (format t "sort age")    ;(set-new-view (sortbyage *view-storage*))
+                            (set-new-view lview (sortbyage *view-storage*))
                             )))
                 (b-sn (make-instance 'button
                             :master fsort
                             :text "Sort by Name"
                             :command (lambda () 
-                                   (format t "sort name")   ;(set-new-view (filterinprice *view-storage*))
+                                   (set-new-view lview (sortbyname *view-storage*))
                                    )))
             (ffilter (make-instance 'frame :master fcontrol))
                 (b-fp (make-instance 'button
                             :master ffilter
                             :text "Filter by Price"
                             :command (lambda () 
-                                   (format t "filter price") ;(set-new-view (filterinprice *view-storage* (text i-fp) (text i-tp)))
+                                   (format t "filter price") ;(set-new-view lview (filterinprice *view-storage* (text i-fp) (text i-tp)))
                                    )))
                 (b-fa (make-instance 'button
                             :master ffilter
                             :text "Filter by Age"
                             :command (lambda () 
-                                   (format t "filter age") ;(set-new-view (filterinage *view-storage* (text i-fa) (text i-ta))))
+                                   (format t "filter age") ;(set-new-view lview (filterinage *view-storage* (text i-fa) (text i-ta))))
                                    )))
                 (b-fn (make-instance 'button
                             :master ffilter
                             :text "Filter by Name"
                             :command (lambda () 
-                                   (format t "filter name") ;(set-new-view (filterinname *view-storage* (text i-n)))
+                                   (format t "filter name") ;(set-new-view lview (filterinname *view-storage* (text i-n)))
                                    )))
 
             (ftoy (make-instance 'frame :master fcontrol))
@@ -159,30 +182,21 @@
                             :master ftoy
                             :text "Delete Toy"
                             :command (lambda () 
-                                   (format t "delete toy") ;(if (add-toy ? (text i-n) (text i-fa) (text i-fp)) (reset-view))
+                                   (format t "delete toy") ;(if (add-toy ? (text i-n) (text i-fa) (text i-fp)) (reset-view lview))
                                    )))
                 (b-add (make-instance 'button
                             :master ftoy
                             :text "Add Toy"
                             :command (lambda () 
-                                   (format t "add toy") ;(progn (delete-toy) (reset-view))
+                                   (progn (delete-toy) (reset-view lview))
                                    )))
                 (b-reset (make-instance 'button
                             :master ftoy
                             :text "Reset view"
                             :command (lambda () 
-                                   (format t "reset view") ;(reset-view)
-                                   )))
-
-            ; View
-            (fview (make-instance 'frame :master f))
-            (lview  (make-instance 'label
-                        :master fview
-                        :text '(concatenate 'string 
-                            (loop for toy in *storage*
-                                while toy
-                                    collect (format nil "~s~&" (toy2str toy))))))
-        )
+                                   (reset-view lview)
+                                   ))))
+                       
         (declare (ignore mf-exit mf-save mf-load sepm))
         
         (pack fparams :side :top :pady 10)
@@ -247,4 +261,5 @@
         (configure f :relief :sunken)     
     )))
 
+; Entrance
 (gui)

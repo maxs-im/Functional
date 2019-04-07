@@ -1,3 +1,3 @@
 10000
-BALL "llaB1" 7 100
+BALL "llaB1" 12 100
 MACHINE "enichaM1" 9 2000
