@@ -71,18 +71,18 @@
         
             ; menu for save  
             (mb (make-menubar))
-            (mfile (make-menu mb "File" ))
-            (mf-load (make-menubutton mfile "Load" (lambda ()
-                                (progn (read-data-from-file) (reset-view lview)))
-                        :underline 1))
-            (mf-save (make-menubutton mfile "Save" (lambda ()
-                                (save-data-to-file))
-                        :underline 1))
-            (sepm (add-separator mfile))   
-            (mf-exit (make-menubutton mfile "Exit" (lambda () 
-                                (setf *exit-mainloop* t))
-                        :underline 1
-                        :accelerator "Ctrl W"))
+                (mfile (make-menu mb "File" ))
+                (mf-load (make-menubutton mfile "Load" (lambda ()
+                                    (progn (read-data-from-file) (reset-view lview)))
+                            :underline 1))
+                (mf-save (make-menubutton mfile "Save" (lambda ()
+                                    (save-data-to-file))
+                            :underline 1))
+                (sepm (add-separator mfile))   
+                (mf-exit (make-menubutton mfile "Exit" (lambda () 
+                                    (setf *exit-mainloop* t))
+                            :underline 1
+                            :accelerator "Ctrl W"))
         
             ; Toy name
             (fname (make-instance 'frame :master fparams))
@@ -178,15 +178,15 @@
                                    )))
 
             (ftoy (make-instance 'frame :master fcontrol))
-                (b-delete (make-instance 'button
-                            :master ftoy
-                            :text "Delete Toy"
-                            :command (lambda () 
-                                   (format t "delete toy") ;(if (add-toy ? (text i-n) (text i-fa) (text i-fp)) (reset-view lview))
-                                   )))
                 (b-add (make-instance 'button
                             :master ftoy
                             :text "Add Toy"
+                            :command (lambda () 
+                                   (format t "add toy") ;(if (add-toy ? (text i-n) (text i-fa) (text i-fp)) (reset-view lview))
+                                   )))
+                (b-delete (make-instance 'button
+                            :master ftoy
+                            :text "Delete Toy"
                             :command (lambda () 
                                    (progn (delete-toy) (reset-view lview))
                                    )))
