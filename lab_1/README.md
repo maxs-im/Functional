@@ -10,8 +10,10 @@ Develop information systems "Software on the network of the faculty." Database t
 
 Original text: _Разработать информационную систем "Программное обеспечение на сети факультета". Таблицы БД содержат такую информацию: Название программного средства, автор (....), текст аннотации, вид, версия, сроки использования, условия использования, где записан дистрибутив, информация о пользователях и популярности программного средства, статистика использования. Предусмотреть возможность введения и корректирования информации. Количество таблиц должно быть больше 5._
 
-## Author & Link
+## Author & Links
 
 - **Maxim Galchenko** (@maxs-im)
+
+[Mid-level client library for the MySQL DB](http://hackage.haskell.org/package/mysql-simple)
 
 [Github Repository](https://github.com/maxs-im/Functional/tree/master/lab_1)
