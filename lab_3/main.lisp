@@ -37,38 +37,12 @@
         (let* ((f (make-instance 'frame))
             ; View
             (fview (make-instance 'frame :master f))
-            (lview  (make-instance 'label
-                        :master fview
-                        :text (print-toys *view-storage*)))
-
-            ; Panel
-            (fpanel (make-instance 'frame :master f))
-
-            ; input
-            (fparams (make-instance 'frame :master fpanel))
-
-            ; radio toy-type select
-            (fradio (make-instance 'frame :master fparams))
-            (ltoys (make-instance 'label
-                        :master fradio
-                        :text "Type: "))
-            (r1 (make-instance 'radio-button
-                        :master fradio
-                        :text "Ball"
-                        :value 'Ball :variable "toy"))
-            (r2 (make-instance 'radio-button
-                        :master fradio
-                        :text "Machine"
-                        :value 'Machine :variable "toy"))
-            (r3 (make-instance 'radio-button
-                        :master fradio 
-                        :text "Constructor" 
-                        :value 'Construct :variable "toy"))
-            (r4 (make-instance 'radio-button 
-                        :master fradio 
-                        :text "Doll" 
-                        :value 'Doll :variable "toy"))
-        
+                (lvheader (make-instance 'label
+                            :master fview
+                            :text "TOYS"))
+                (lview  (make-instance 'label
+                            :master fview
+                            :text (print-toys *view-storage*)))
             ; menu for save  
             (mb (make-menubar))
                 (mfile (make-menu mb "File" ))
@@ -83,169 +57,198 @@
                                     (setf *exit-mainloop* t))
                             :underline 1
                             :accelerator "Ctrl W"))
-        
-            ; Toy name
-            (fname (make-instance 'frame :master fparams))
-            (lname (make-instance 'label
-                        :master fname
-                        :text "Toy name: "))
-            (i-n (make-instance 'entry 
-                        :master fname
-                        :text "name"))
-            ; Toy price borders
-            (fprice (make-instance 'frame :master fparams))
-            (lprice (make-instance 'label
-                        :master fprice
-                        :text "For price (from -> to): "))
-            (i-pf (make-instance 'entry 
-                        :master fprice
-                        :text 0
-                        :validate :key))
-            (i-pt (make-instance 'entry
-                        :master fprice
-	                    :text 0
-	                    :validate :key))
-            ; Toy age borders
-            (fage (make-instance 'frame :master fparams))
-            (lage (make-instance 'label
-                        :master fage
-                        :text "For age (from -> to):   "))
-            (i-af (make-instance 'entry 
-                        :master fage
-                        :text 0
-                        :validate :key))
-            (i-at (make-instance 'entry
-                        :master fage
-	                    :text 0
-	                    :validate :key))
 
-            ; Budget
-            (fbudget (make-instance 'frame :master fparams))
-            (lbudget (make-instance 'label
-                        :master fbudget
-                        :text "Budget: "))
-            (i-b (make-instance 'entry 
-                        :master fbudget
-                        :text *budget*
-                        :validate :key))
-            (b-b (make-instance 'button
-                        :master fbudget
-                        :text "UPDATE"))
+            ; Panel
+            (fpanel (make-instance 'frame :master f))
+                ; input
+                (fparams (make-instance 'frame :master fpanel))
+
+                    ; radio toy-type select
+                    (fradio (make-instance 'frame :master fparams))
+                        (ltoys (make-instance 'label
+                                    :master fradio
+                                    :text "Type: "))
+                        (r1 (make-instance 'radio-button
+                                    :master fradio
+                                    :text "Ball"
+                                    :value 'Ball :variable "toy"))
+                        (r2 (make-instance 'radio-button
+                                    :master fradio
+                                    :text "Machine"
+                                    :value 'Machine :variable "toy"))
+                        (r3 (make-instance 'radio-button
+                                    :master fradio 
+                                    :text "Constructor" 
+                                    :value 'Construct :variable "toy"))
+                        (r4 (make-instance 'radio-button 
+                                    :master fradio 
+                                    :text "Doll" 
+                                    :value 'Doll :variable "toy"))
             
-            ; control
-            (fcontrol (make-instance 'frame :master fpanel))
+                    ; Toy name
+                    (fname (make-instance 'frame :master fparams))
+                        (lname (make-instance 'label
+                                    :master fname
+                                    :text "Toy name: "))
+                        (i-n (make-instance 'entry 
+                                    :master fname
+                                    :text "name"))
+                    ; Toy price borders
+                    (fprice (make-instance 'frame :master fparams))
+                        (lprice (make-instance 'label
+                                    :master fprice
+                                    :text "For price (from -> to): "))
+                        (i-pf (make-instance 'entry 
+                                    :master fprice
+                                    :text 0
+                                    :validate :key))
+                        (i-pt (make-instance 'entry
+                                    :master fprice
+                                    :text 0
+                                    :validate :key))
+                    ; Toy age borders
+                    (fage (make-instance 'frame :master fparams))
+                        (lage (make-instance 'label
+                                    :master fage
+                                    :text "For age (from -> to):   "))
+                        (i-af (make-instance 'entry 
+                                    :master fage
+                                    :text 0
+                                    :validate :key))
+                        (i-at (make-instance 'entry
+                                    :master fage
+                                    :text 0
+                                    :validate :key))
 
-            (fsort (make-instance 'frame :master fcontrol))
-                (b-sp (make-instance 'button
-                            :master fsort
-                            :text "Sort by Price"
-                            :command (lambda () 
-                                   (set-new-view lview (sortbyprice *view-storage*))
-                                   )))
-                (b-sa (make-instance 'button
-                            :master fsort
-                            :text "Sort by Age"
-                            :command (lambda () 
-                            (set-new-view lview (sortbyage *view-storage*))
-                            )))
-                (b-sn (make-instance 'button
-                            :master fsort
-                            :text "Sort by Name"
-                            :command (lambda () 
-                                   (set-new-view lview (sortbyname *view-storage*))
-                                   )))
-            (ffilter (make-instance 'frame :master fcontrol))
-                (b-fp (make-instance 'button
-                            :master ffilter
-                            :text "Filter by Price"))
-                (b-fa (make-instance 'button
-                            :master ffilter
-                            :text "Filter by Age"))
-                (b-fn (make-instance 'button
-                            :master ffilter
-                            :text "Filter by Name"))
+                    ; Budget
+                    (fbudget (make-instance 'frame :master fparams))
+                        (lbudget (make-instance 'label
+                                    :master fbudget
+                                    :text "Budget: "))
+                        (i-b (make-instance 'entry 
+                                    :master fbudget
+                                    :text *budget*
+                                    :validate :key))
+                        (b-b (make-instance 'button
+                                    :master fbudget
+                                    :text "UPDATE"))
+                
+                ; control
+                (fcontrol (make-instance 'frame :master fpanel))
 
-            (ftoy (make-instance 'frame :master fcontrol))
-                (b-add (make-instance 'button
-                            :master ftoy
-                            :text "Add Toy"
-                            ))
-                (b-delete (make-instance 'button
-                            :master ftoy
-                            :text "Delete Toy"
-                            :command (lambda () 
-                                   (progn (delete-toy) (reset-view lview))
-                                   )))
-                (b-reset (make-instance 'button
-                            :master ftoy
-                            :text "Reset view"
-                            :command (lambda () 
-                                   (reset-view lview)
-                                   ))))
-                       
+                    (fsort (make-instance 'frame :master fcontrol))
+                        (b-sp (make-instance 'button
+                                    :master fsort
+                                    :text "Sort by Price"
+                                    :command (lambda () 
+                                        (set-new-view lview (sortbyprice *view-storage*))
+                                        )))
+                        (b-sa (make-instance 'button
+                                    :master fsort
+                                    :text "Sort by Age"
+                                    :command (lambda () 
+                                    (set-new-view lview (sortbyage *view-storage*))
+                                    )))
+                        (b-sn (make-instance 'button
+                                    :master fsort
+                                    :text "Sort by Name"
+                                    :command (lambda () 
+                                        (set-new-view lview (sortbyname *view-storage*))
+                                        )))
+                    (ffilter (make-instance 'frame :master fcontrol))
+                        (b-fp (make-instance 'button
+                                    :master ffilter
+                                    :text "Filter by Price"))
+                        (b-fa (make-instance 'button
+                                    :master ffilter
+                                    :text "Filter by Age"))
+                        (b-fn (make-instance 'button
+                                    :master ffilter
+                                    :text "Filter by Name"))
+
+                    (ftoy (make-instance 'frame :master fcontrol))
+                        (b-add (make-instance 'button
+                                    :master ftoy
+                                    :text "Add Toy"
+                                    ))
+                        (b-delete (make-instance 'button
+                                    :master ftoy
+                                    :text "Delete Toy"
+                                    :command (lambda () 
+                                        (progn (delete-toy) (reset-view lview))
+                                        )))
+                        (b-reset (make-instance 'button
+                                    :master ftoy
+                                    :text "Reset view"
+                                    :command (lambda () 
+                                        (reset-view lview)
+                                        ))))
+                        
         (declare (ignore mf-exit mf-save mf-load sepm))
-        
-        (pack fparams :side :top :pady 10)
-        (configure fparams :borderwidth 5)
-        (configure fparams :relief :sunken)
-        
-            (pack fradio :side :top :fill :x)
-            (pack (list ltoys r1 r2 r3 r4) :side :left)
-            ; set deafult value for toy-type
-            (setf (value r1) "ball")
-
-           
-            (pack fname :side :top :fill :x)
-            (pack (list lname i-n) :side :left)
-            (pack fprice :side :top :fill :x)
-            (pack (list lprice i-pf i-pt) :side :left)
-            (pack fage :side :top :fill :x)
-            (pack (list lage i-af i-at) :side :left)
-
-            (pack fbudget :side :top :fill :x)
-            (configure fbudget :borderwidth 5)
-            (configure fbudget :relief :sunken)
-            (pack (list lbudget i-b b-b) :side :left)
-        
-            ; validate each integer input
-            (format-wish "~A configure -validatecommand {string is int %P}"
-                (widget-path i-pf))
-            (format-wish "~A configure -validatecommand {string is int %P}"
-                (widget-path i-pt))
-            (format-wish "~A configure -validatecommand {string is int %P}"
-                (widget-path i-af))
-            (format-wish "~A configure -validatecommand {string is int %P}"
-                (widget-path i-at))
-            (format-wish "~A configure -validatecommand {string is int %P}"
-                (widget-path i-b))
-    
-    
-        (pack fcontrol :side :top)
-            
-            (pack fsort :side :top)
-            (pack (list b-sn b-sp b-sa) :side :left)
-
-            (pack ffilter :side :top :pady 10)
-            (pack (list b-fn b-fp b-fa) :side :left)
-            
-            (pack ftoy :side :top :pady 10)
-            (pack (list b-add b-delete b-reset) :side :left)
-    
-        (pack fview :side :right :fill :both)
-            (configure fview :borderwidth 5)
-            ;(configure fview :background :blue)
-            (configure fview :relief :solid)
-
-            (pack lview)
-
-        (pack fpanel :side :left)
-            (configure fpanel :borderwidth 5)
-            (configure fpanel :relief :raised)
         
         (pack f)
         (configure f :borderwidth 3)
-        (configure f :relief :sunken) 
+        (configure f :relief :sunken)
 
+            (pack fpanel :side :left)
+                (configure fpanel :borderwidth 5)
+                (configure fpanel :relief :raised)
+
+                (pack fparams :side :top :pady 10)
+                (configure fparams :borderwidth 5)
+                (configure fparams :relief :sunken)
+                
+                    (pack fradio :side :top :fill :x)
+                    (pack (list ltoys r1 r2 r3 r4) :side :left)
+                    ; set deafult value for toy-type
+                    (setf (value r1) "ball")
+
+                
+                    (pack fname :side :top :fill :x)
+                    (pack (list lname i-n) :side :left)
+                    (pack fprice :side :top :fill :x)
+                    (pack (list lprice i-pf i-pt) :side :left)
+                    (pack fage :side :top :fill :x)
+                    (pack (list lage i-af i-at) :side :left)
+
+                    (pack fbudget :side :top :fill :x)
+                    (configure fbudget :borderwidth 5)
+                    (configure fbudget :relief :sunken)
+                    (pack (list lbudget i-b b-b) :side :left)
+                
+                    ; validate each integer input
+                    (format-wish "~A configure -validatecommand {string is int %P}"
+                        (widget-path i-pf))
+                    (format-wish "~A configure -validatecommand {string is int %P}"
+                        (widget-path i-pt))
+                    (format-wish "~A configure -validatecommand {string is int %P}"
+                        (widget-path i-af))
+                    (format-wish "~A configure -validatecommand {string is int %P}"
+                        (widget-path i-at))
+                    (format-wish "~A configure -validatecommand {string is int %P}"
+                        (widget-path i-b))
+            
+            
+                (pack fcontrol :side :top)
+                    
+                    (pack fsort :side :top)
+                    (pack (list b-sn b-sp b-sa) :side :left)
+
+                    (pack ffilter :side :top :pady 10)
+                    (pack (list b-fn b-fp b-fa) :side :left)
+                    
+                    (pack ftoy :side :top :pady 10)
+                    (pack (list b-add b-delete b-reset) :side :left)
+            
+            (pack fview :side :right :fill :both)
+                (configure fview :borderwidth 5)
+                ;(configure fview :background :blue)
+                (configure fview :relief :solid)
+
+                    (pack lvheader)
+                    (pack lview)
+         
+        ; key bindings with not trivial logic
         (bind b-add "<Button-1>"
             (lambda (evt)
                 (declare (ignore evt))
