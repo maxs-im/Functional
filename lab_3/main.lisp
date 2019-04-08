@@ -40,9 +40,11 @@
                 (lvheader (make-instance 'label
                             :master fview
                             :text "TOYS"))
-                (lview  (make-instance 'label
-                            :master fview
-                            :text (print-toys *view-storage*)))
+                (sfv (make-instance 'scrolled-frame
+                            :master fview))
+                    (lview  (make-instance 'label
+                                :master (interior sfv)
+                                :text (print-toys *view-storage*)))
             ; menu for save  
             (mb (make-menubar))
                 (mfile (make-menu mb "File" ))
@@ -246,7 +248,8 @@
                 (configure fview :relief :solid)
 
                     (pack lvheader)
-                    (pack lview)
+                    (pack sfv)
+                        (pack lview)
          
         ; key bindings with not trivial logic
         (bind b-add "<Button-1>"
