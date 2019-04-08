@@ -14,6 +14,6 @@ Original text: _Разработать информационную систем
 
 - **Maxim Galchenko** (@maxs-im)
 
-[Mid-level client library for the MySQL DB](http://hackage.haskell.org/package/mysql-simple)
+1. [Mid-level client library for the MySQL DB](http://hackage.haskell.org/package/mysql-simple)
 
 [Github Repository](https://github.com/maxs-im/Functional/tree/master/lab_1)

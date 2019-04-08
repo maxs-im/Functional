@@ -20,7 +20,7 @@ Original text: _Игровая комната. Подготовить игров
 
 - **Maxim Galchenko** (@maxs-im)
 
-[GUI Toolkit __(LTK)__](http://www.peter-herth.de/ltk/index.html)
-[Library manager __(Quicklisp)__](https://www.quicklisp.org/beta/)
+1. [GUI Toolkit __(LTK)__](http://www.peter-herth.de/ltk/index.html)
+2. [Library manager __(Quicklisp)__](https://www.quicklisp.org/beta/)
 
 [Github Repository](https://github.com/maxs-im/Functional/tree/master/lab_3)
