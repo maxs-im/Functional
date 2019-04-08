@@ -130,10 +130,7 @@
                         :validate :key))
             (b-b (make-instance 'button
                         :master fbudget
-                        :text "UPDATE"
-                        :command (lambda () 
-                            (format t "update budget~&") ;(progn (if (update-budget (text i-b)) (update-view-budget)))
-                            )))
+                        :text "UPDATE"))
             
             ; control
             (fcontrol (make-instance 'frame :master fpanel))
@@ -281,7 +278,15 @@
                 (declare (ignore evt))
                 (set-new-view lview
                     (filterinname *view-storage* (text i-n)))))
-    )))
+        
+        (bind b-b "<Button-1>"
+            (lambda (evt)
+                (declare (ignore evt))
+                (progn (if (not (update-budget (parse-integer (text i-b))))
+                    (progn (do-msg 
+                            (format nil "Too small budget for existing toys (~D)" *budget*)
+                            :title "Incorrect budget")
+                        (setf (text i-b) *budget*)))))))))
 
 ; Entrance
 (gui)
