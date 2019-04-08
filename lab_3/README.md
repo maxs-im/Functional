@@ -16,8 +16,11 @@ Sort the toys in the room according to one of the parameters. Find the toys in t
 
 Original text: _Игровая комната. Подготовить игровую комнату для детей разных возрастных групп. Игрушек должно быть фиксированное количество в пределах выделенной суммы денег. Должны встречаться игрушки родственных групп, н-р: маленькие, средние и большие машины, куклы, мячи, кубики. Провести сортировку игрушек в  комнате по одному из параметров. Найти игрушки в комнате, соответствующие заданному диапазону параметров._
 
-## Author & Link
+## Author & Links
 
 - **Maxim Galchenko** (@maxs-im)
+
+[GUI Toolkit __(LTK)__](http://www.peter-herth.de/ltk/index.html)
+[Library manager __(Quicklisp)__](https://www.quicklisp.org/beta/)
 
 [Github Repository](https://github.com/maxs-im/Functional/tree/master/lab_3)
