@@ -160,30 +160,19 @@
             (ffilter (make-instance 'frame :master fcontrol))
                 (b-fp (make-instance 'button
                             :master ffilter
-                            :text "Filter by Price"
-                            :command (lambda () 
-                                   (format t "filter price") ;(set-new-view lview (filterinprice *view-storage* (text i-fp) (text i-tp)))
-                                   )))
+                            :text "Filter by Price"))
                 (b-fa (make-instance 'button
                             :master ffilter
-                            :text "Filter by Age"
-                            :command (lambda () 
-                                   (format t "filter age") ;(set-new-view lview (filterinage *view-storage* (text i-fa) (text i-ta))))
-                                   )))
+                            :text "Filter by Age"))
                 (b-fn (make-instance 'button
                             :master ffilter
-                            :text "Filter by Name"
-                            :command (lambda () 
-                                   (format t "filter name") ;(set-new-view lview (filterinname *view-storage* (text i-n)))
-                                   )))
+                            :text "Filter by Name"))
 
             (ftoy (make-instance 'frame :master fcontrol))
                 (b-add (make-instance 'button
                             :master ftoy
                             :text "Add Toy"
-                            :command (lambda () 
-                                   (format t "add toy") ;(if (add-toy ? (text i-n) (text i-fa) (text i-fp)) (reset-view lview))
-                                   )))
+                            ))
                 (b-delete (make-instance 'button
                             :master ftoy
                             :text "Delete Toy"
@@ -258,7 +247,40 @@
         
         (pack f)
         (configure f :borderwidth 3)
-        (configure f :relief :sunken)     
+        (configure f :relief :sunken) 
+
+        (bind b-add "<Button-1>"
+            (lambda (evt)
+                (declare (ignore evt))
+                (if (add-toy  
+                        (value r1) 
+                        (text i-n) 
+                        (parse-integer (text i-af)) 
+                        (parse-integer (text i-pf)))
+                    (reset-view lview)
+                    (do-msg "Not enough money in the budget" :title "Toy is not added"))))
+        
+        (bind b-fp "<Button-1>"
+            (lambda (evt)
+                (declare (ignore evt))
+                (set-new-view lview
+                    (filterinprice *view-storage* 
+                        (parse-integer (text i-pf)) 
+                        (parse-integer (text i-pt))))))
+        
+        (bind b-fa "<Button-1>"
+            (lambda (evt)
+                (declare (ignore evt))
+                (set-new-view lview
+                    (filterinage *view-storage*
+                        (parse-integer (text i-af))
+                        (parse-integer (text i-at))))))
+
+        (bind b-fn "<Button-1>"
+            (lambda (evt)
+                (declare (ignore evt))
+                (set-new-view lview
+                    (filterinname *view-storage* (text i-n)))))
     )))
 
 ; Entrance
