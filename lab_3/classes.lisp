@@ -83,7 +83,7 @@
             (setq *budget* new-price))
             available))
 (defun check-budget (price-to-add)
-    (>= (- *budget* (reduce (lambda (s1 s2) (+ (read-price s1) (read-price s2))) *storage*)) price-to-add))
+    (>= *budget* (reduce #'+ (mapcar 'read-price *storage*) :initial-value price-to-add)))
 (defun add-toy (toy name age price)
     (let ((available (check-budget price)))
         (if available
