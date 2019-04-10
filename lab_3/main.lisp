@@ -219,17 +219,9 @@
                     (pack (list lbudget i-b b-b) :side :left)
                 
                     ; validate each integer input
-                    (format-wish "~A configure -validatecommand {string is int %P}"
-                        (widget-path i-pf))
-                    (format-wish "~A configure -validatecommand {string is int %P}"
-                        (widget-path i-pt))
-                    (format-wish "~A configure -validatecommand {string is int %P}"
-                        (widget-path i-af))
-                    (format-wish "~A configure -validatecommand {string is int %P}"
-                        (widget-path i-at))
-                    (format-wish "~A configure -validatecommand {string is int %P}"
-                        (widget-path i-b))
-            
+                    (dolist (el (list i-pf i-pt i-af i-at i-b))
+                        (format-wish "~A configure -validatecommand {string is int %P}"
+                            (widget-path el)))
             
                 (pack fcontrol :side :top)
                     
