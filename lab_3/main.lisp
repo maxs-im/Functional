@@ -81,7 +81,7 @@
                         (r3 (make-instance 'radio-button
                                     :master fradio 
                                     :text "Constructor" 
-                                    :value 'Construct :variable "toy"))
+                                    :value 'Constructor :variable "toy"))
                         (r4 (make-instance 'radio-button 
                                     :master fradio 
                                     :text "Doll" 
